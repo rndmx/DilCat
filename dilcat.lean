@@ -10,6 +10,7 @@ import Mathlib.Data.Setoid.Basic
 import Mathlib.CategoryTheory.Quotient
 import Mathlib.CategoryTheory.ComposableArrows
 import Mathlib.Tactic.Linarith
+import Mathlib.CategoryTheory.Functor.FullyFaithful
 noncomputable section
 
 open CategoryTheory
@@ -289,7 +290,6 @@ def image_Sieve (D : Cat)  (F : C ⥤ D) (i : Z.I) :
 def image_mor_sieve (D : Cat) (F : C ⥤ D) (i : Z.I) :
     CategoryTheory.Sieve (F.obj (Z.cod i)) :=
   CategoryTheory.Sieve.generateSingleton (F.map (Z.mor i))
-
 
 
 theorem univ_prop (D: Cat ) (F: C ⥤ D)  (reg: Faithful ((CenterimagProperty Z D F).Q))
