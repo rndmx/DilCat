@@ -264,6 +264,57 @@ def functor_cat_to_dil : C ⥤ Dil Z where
   map_comp {X Y Z} f g :=
 
 
+
+def is_in_imag (D: Cat ) (F: C ⥤ D) (f : Σ X Y : D, X ⟶ Y) : Prop :=
+  ∃ i : Z.I, f = ⟨F.obj (Z.dom i), F.obj (Z.cod i), F.map (Z.mor i)⟩
+
+
+def CenterimagProperty (D: Cat ) (Funct: C ⥤ D) : MorphismProperty D :=
+    fun X Y f => is_in_imag Z D Funct ⟨X, Y, f⟩
+
+def image_Sieve (D : Cat)  (Funct : C ⥤ D) (i : Z.I) :
+    Sieve (Funct.obj (Z.cod i)) :=
+  Sieve.functorPushforward Funct (Z.N i)
+
+def image_mor_sieve (D : Cat) (Funct : C ⥤ D) (i : Z.I) :
+    CategoryTheory.Sieve (Funct.obj (Z.cod i)) :=
+  CategoryTheory.Sieve.generateSingleton (Funct.map (Z.mor i))
+
+
+lemma triangle (Z: Center C) :  (CenterMorphismProperty Z).Q =
+  functor_cat_to_dil Z ≫ functor_dil_to_loc Z := by sorry
+
+lemma facto_exists (D: Cat ) (Funct: C ⥤ D)
+  (reg: Faithful ((CenterimagProperty Z D Funct).Q)) (i : Z.I) (n : (Z.N i).arrows)
+  (he :   image_Sieve Z D Funct i ≤ image_mor_sieve Z D Funct i)  :
+  ∃ b : Funct.obj dom n → Funct.obj dom Z.mor ∧ Funct.hom n = b ≫ Funct.hom Z.mor i := by sorry
+
+
+lemma facto_unique (D: Cat ) (Funct: C ⥤ D)
+  (reg: Faithful ((CenterimagProperty Z D Funct).Q)) (i : Z.I) (n : (Z.N i).arrows)
+  (he :   image_Sieve Z D Funct i ≤ image_mor_sieve Z D Funct i)
+   (b : Funct.obj dom n → Funct.obj dom Z.mor ∧ Funct.hom n = b ≫ Funct.hom Z.mor i)
+    (b': Funct.obj dom n → Funct.obj dom Z.mor ∧ Funct.hom n = b' ≫ Funct.hom Z.mor i) :b=b' := by
+        sorry
+
+
+
+theorem univ_prop (D: Cat ) (F: C ⥤ D)  (reg: Faithful ((CenterimagProperty Z D F).Q))
+  (hs : ∀ i : Z.I,  image_Sieve Z D F i ≤ image_mor_sieve Z D F i) :
+  ∃! (G : Dil Z ⥤ D), F ⋙ G = functor_cat_to_dil Z  := by
+   -- adapt the proof in case of dilatations of rings in the Proj file
+    sorry
+
+
+
+/-
+def inv_in_loc (i : Z.I) :
+  ((LocalizationFunctor Z).obj (Z.cod i) ⟶ (LocalizationFunctor Z).obj (Z.dom i)) :=
+  Localization.Construction.wInv (Z.mor i) ⟨i, rfl⟩ -/
+
+
+
+/--/
 lemma triangle (Z: Center C) :  (CenterMorphismProperty Z).Q =
   functor_cat_to_dil Z ≫ functor_dil_to_loc Z := by sorry
 
@@ -274,32 +325,4 @@ lemma facto_exists (Z: Center C)  (i : Z.I) (n : (Z.N i).arrows) :
 lemma facto_unique (Z: Center C)  (i : Z.I) (n : (Z.N i).arrows) (b, b': dom n → dom Z.mor i) :
   (hb: ) (hb': ) : b=b':= by
         sorry
-
-
-def is_in_imag (D: Cat ) (F: C ⥤ D) (f : Σ X Y : D, X ⟶ Y) : Prop :=
-  ∃ i : Z.I, f = ⟨F.obj (Z.dom i), F.obj (Z.cod i), F.map (Z.mor i)⟩
-
-
-def CenterimagProperty (D: Cat ) (F: C ⥤ D) : MorphismProperty D :=
-    fun X Y f => is_in_imag Z D F ⟨X, Y, f⟩
-
-def image_Sieve (D : Cat)  (F : C ⥤ D) (i : Z.I) :
-    Sieve (F.obj (Z.cod i)) :=
-  Sieve.functorPushforward F (Z.N i)
-
-def image_mor_sieve (D : Cat) (F : C ⥤ D) (i : Z.I) :
-    CategoryTheory.Sieve (F.obj (Z.cod i)) :=
-  CategoryTheory.Sieve.generateSingleton (F.map (Z.mor i))
-
-
-theorem univ_prop (D: Cat ) (F: C ⥤ D)  (reg: Faithful ((CenterimagProperty Z D F).Q))
-  (hs : ∀ i : Z.I,  image_Sieve Z D F i ≤ image_mor_sieve Z D F i) :
-  ∃! (G : Dil Z ⥤ D), F ⋙ G = functor_cat_to_dil Z  := by
-    sorry
-
-
-
-/-
-def inv_in_loc (i : Z.I) :
-  ((LocalizationFunctor Z).obj (Z.cod i) ⟶ (LocalizationFunctor Z).obj (Z.dom i)) :=
-  Localization.Construction.wInv (Z.mor i) ⟨i, rfl⟩ -/
+-/
