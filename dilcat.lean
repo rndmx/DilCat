@@ -157,9 +157,9 @@ def composition (F F' : Fraction Z) (compat : F.Xs (F.k + 1) = F'.Xs 0) : Fracti
     eqToHom (by simp [if_pos (Nat.le_of_lt hj)]) ≫ F.n_orig ⟨j, hj⟩ ≫
     eqToHom (by simp [if_pos (Nat.le_of_lt hj)])
   else
-    if j = F.k+1 then
-    eqToHom (by sorry) ≫ F.a ≫ eqToHom (by sorry) ≫ F'.n_orig ⟨j - (F.k + 1), by sorry⟩ ≫ eqToHom (by sorry)
-    else
+    if j = F.k then
+    eqToHom (by sorry) ≫ F.a ≫ eqToHom compat ≫ F'.n_orig ⟨0, by sorry⟩ ≫ eqToHom (by sorry)
+   else    -- j > F.k
        eqToHom (by sorry) ≫ F'.n_orig ⟨j - (F.k + 1), by sorry ⟩ ≫ eqToHom (by sorry),
 
   n_dom := by sorry,
