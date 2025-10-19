@@ -3,14 +3,16 @@ import Mathlib.CategoryTheory.Functor.Basic
 import Mathlib.CategoryTheory.EqToHom
 import Mathlib.CategoryTheory.Sites.Sieves
 import Mathlib.CategoryTheory.Localization.Construction
-import Mathlib.CategoryTheory.Functor.Basic
-import Lean
 import Mathlib.Data.Finset.Fold
 import Mathlib.Data.Setoid.Basic
 import Mathlib.CategoryTheory.Quotient
 import Mathlib.CategoryTheory.ComposableArrows
 import Mathlib.Tactic.Linarith
 import Mathlib.CategoryTheory.Functor.FullyFaithful
+import Init.Data.Nat.Basic
+import Init.Data.Int.Order
+import Mathlib.Data.Nat.Basic
+import Mathlib.Data.Real.Basic
 noncomputable section
 
 open CategoryTheory
@@ -140,35 +142,134 @@ def composition (F F' : Fraction Z) (compat : F.Xs (F.k + 1) = F'.Xs 0) : Fracti
     if h : n ≤ F.k  then
       F.Xs n
     else
-      F'.Xs (n - (F.k +1)),  -- shift F'’s indices
+      F'.Xs (n - (F.k )),  -- shift F'’s indices
   Ys := fun n =>
-    if h : n ≤ F.k  then
+    if h : n < F.k  then
       F.Ys n
     else
-      F'.Ys (n - (F.k + 1)),
+      F'.Ys (n - (F.k )),
   i := fun n =>
-    if h : n ≤ F.k  then
+    if h : n < F.k  then
       F.i n
     else
-      F'.i (n - (F.k + 1)),
+      F'.i (n - (F.k )),
 
   n_orig := fun j =>
   if hj : j < F.k then
     eqToHom (by simp [if_pos (Nat.le_of_lt hj)]) ≫ F.n_orig ⟨j, hj⟩ ≫
-    eqToHom (by simp [if_pos (Nat.le_of_lt hj)])
+      eqToHom (Eq.symm (dif_pos hj))
   else
-    if j = F.k then
-    eqToHom (by sorry) ≫ F.a ≫ eqToHom compat ≫ F'.n_orig ⟨0, by sorry⟩ ≫ eqToHom (by sorry)
+    if heq : j = F.k then
+    eqToHom (by
+      by_cases h : j ≤ F.k
+      { have hval : ↑j = F.k := heq
+        rw [hval]
+        by_cases  h1 : F.k ≤ F.k
+        {simp}
+        {simp } }
+      {simp
+       exfalso
+       apply h
+       rw [heq]}) ≫
+         F.a ≫
+         eqToHom compat ≫
+         F'.n_orig ⟨0, by
+             have hpos : 0 < F'.k := by
+               have hj_sub : ↑j < F.k + F'.k := j.2
+               rw [heq] at hj_sub
+               exact lt_of_add_lt_add_left hj_sub
+             exact hpos⟩
+         ≫ eqToHom (by
+            by_cases h : j ≤ F.k
+            {have hval : ↑j = F.k := heq
+             simp
+             rw [hval]
+             by_cases  h1 : F.k ≤ F.k
+             {simp}
+             {simp}
+             }
+            {simp
+             exfalso
+             apply h
+             rw [heq]}
+                )
    else    -- j > F.k
-       eqToHom (by sorry) ≫ F'.n_orig ⟨j - (F.k + 1), by sorry ⟩ ≫ eqToHom (by sorry),
+       eqToHom (by
+       by_cases h : j < F.k
+       { simp at h
+         exfalso
+         contradiction}
+       { by_cases h0 :  ↑j ≤ F.k
+         { have eqj : ↑j = F.k := le_antisymm h0 (le_of_not_gt hj)
+           contradiction}
+         { simp[h0] } }  ) ≫ F'.n_orig ⟨j - (F.k), by
+                                     have hpos : F.k < ↑j := lt_of_le_of_ne (le_of_not_gt hj) (Ne.symm heq)
+                                     have hgfr : ↑j < F.k + F'.k := j.2
+                                     have hsub : ↑j - F.k < F'.k := by
+                                        have hpos_nat : F.k < j.val := hpos
+                                        have hgfr_nat : j.val < F.k + F'.k := j.2
+                                        have hgfz_nat : j.val - F.k < F'.k := by
+                                          rw[AddLECancellable.tsub_lt_iff_left]
+                                          {exact hgfr_nat}
+                                          {intro a b c
+                                           exact Nat.le_of_add_le_add_left c}
+                                          {have hgo: F.k ≤ ↑j := by exact le_of_lt hpos
+                                           exact hgo
+                                          }
+                                        exact hgfz_nat
+                                     exact hsub  ⟩    ≫ eqToHom (by
+                                                    by_cases hgp: (if h : ↑j < F.k then true else false)
+                                                    {simp[hj]}
+                                                    {simp[hj]}),
 
-  n_dom := by sorry,
+  n_dom := by
+    intro j
+    by_cases h: j < F.k
+    { simp [h]
+      have hx : ↑j + 1 ≤ F.k := Nat.succ_le_of_lt h
+      simp[hx]
+      have hgds : Z.dom (F.i ↑j) = F.Xs (↑j + 1) := by simp[F.n_dom ⟨j, by
+                                                               have hj : ↑j < F.k := Nat.lt_of_succ_le hx
+                                                               exact hj  ⟩]
+      exact hgds                                                        }
+    { simp[h]
+      by_cases abs:  ↑j + 1 ≤ F.k
+      {exfalso
+       contradiction}
+      {simp[abs]
+       have htr :  Z.dom (F'.i (↑j - F.k)) = F'.Xs ((↑j - F.k)+1):=  by simp[F'.n_dom ⟨(↑j - F.k), by sorry  ⟩]
+       simp[htr]
+       have hjk : F.k ≤ ↑j := Nat.le_of_not_lt h
+       have hsub : ↑j - F.k + 1 = ↑j + 1 - F.k := by sorry
+       simp[hsub]}},
 
-  n_cod := by sorry,
 
-  n := fun j => sorry,
 
-  n_in_N := by sorry,
+
+  n_cod := by
+         intro j
+         by_cases ppz : ↑j < F.k
+         { simp [ppz]
+           have hgc : Z.cod (F.i ↑j) = F.Ys ↑j := by simp[F.n_cod ⟨j, by exact ppz ⟩]
+           exact hgc
+         }
+         { simp[ppz]
+           have erer : Z.cod (F'.i (↑j - F.k)) = F'.Ys (↑j - F.k) := by simp[F'.n_cod ⟨(↑j - F.k), by sorry ⟩]
+           exact erer},
+
+  n_in_N := by
+      intro j
+      by_cases  h : ↑j < F.k
+      {simp[h]
+       by_cases hle : ↑j < F.k
+       { by
+         exact F.n_in_N ⟨j, by exact hle ⟩ }
+       { exfalso
+         contradiction } }
+       {}
+       }
+      {},
+
     --use seeve property,
 
   a := by sorry, -- F'.a,          -- final arrow comes from the second fraction
