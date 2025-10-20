@@ -309,7 +309,7 @@ def composition (F F' : Fraction Z) (compat : F.Xs (F.k + 1) = F'.Xs 0) : Fracti
                               }          ),
 
 
-  a_dom := by sorry }
+  a_dom := by sorry } --routine
 
 lemma fraction_lemma (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = F'.Xs 0):
   F'.Xs (F'.k + 1) =
@@ -338,13 +338,53 @@ lemma fraction_in_loc_full_comp (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = 
      sorry) ≫
       fraction_in_loc_full Z (composition Z F F' compat) ≫
        eqToHom (by sorry)  := by
-            sorry
+            sorry -- longer proof but nothing hard 
 
 
 def prescr : MorphismProperty (CenterMorphismProperty Z).Localization := fun X Y f =>
-       ∃ (F : Fraction Z), f = eqToHom (by sorry) ≫ fraction_in_loc_full Z F ≫ eqToHom (by sorry)
+       ∃ (F : Fraction Z)
+         (h0: X = (objEquiv (CenterMorphismProperty Z)) (F.Xs 0))
+         (h1: (objEquiv (CenterMorphismProperty Z)) (F.Xs (F.k + 1)) = Y),
+       f = eqToHom (by simp[h0]) ≫ fraction_in_loc_full Z F ≫ eqToHom (by simp[h1])
 
-def prescr_id_mem : ∀ X : (CenterMorphismProperty Z).Localization, prescr Z (𝟙 X) := by sorry
+def fra_id_def (Z: Center C) (X: C) : Fraction Z :=
+{ k := 0,
+  Xs := fun n => X,
+  Ys := fun n => X,
+  i := fun n => Classical.choice Z.nonempty,
+  n_orig := fun j => (𝟙 X),
+  n_dom := by
+    simp,
+  n_cod := by
+    simp,
+  n_in_N := by
+    sorry,
+  a := (𝟙 X),
+  a_dom := by
+    sorry }
+
+lemma fra_id_in_loc (Z: Center C) (X: C) :
+  fraction_in_loc_full Z (fra_id_def Z X) =
+    (LocalizationFunctor Z).map (𝟙 X) := by
+      simp [fraction_in_loc_full, fra_id_def]
+      sorry
+
+def prescr_id_mem' : ∀ X : C, prescr Z (𝟙 (objEquiv (CenterMorphismProperty Z) X))  :=
+  fun X => ⟨fra_id_def Z X,
+            sorry,
+            sorry,
+            --exact fra_id_in_loc Z X
+            sorry⟩
+
+
+def prescr_id_mem : ∀ X : (CenterMorphismProperty Z).Localization, prescr Z (𝟙 X)  := by
+     --prescr_id_mem'
+     sorry
+
+
+
+
+
 
 def prescr_comp_mem : ∀ {X Y P : (CenterMorphismProperty Z).Localization}
     {f : X ⟶ Y} {g : Y ⟶ P}, prescr Z f → prescr Z g → prescr Z (f ≫ g) := by sorry
@@ -361,9 +401,12 @@ instance prescr_multiplicative : MorphismProperty.IsMultiplicative (prescr Z) wh
 
 def Dil := WideSubcategory  (prescr Z)
 
+instance : Category (Dil Z) :=
+  WideSubcategory.category (prescr Z)
 
-def functor_dil_to_loc : Dil Z  ⥤ (CenterMorphismProperty Z).Localization :=
-  wideSubcategoryInclusionFunctor (prescr Z)
+
+def functor_dil_to_loc : WideSubcategory  (prescr Z)  ⥤ (CenterMorphismProperty Z).Localization :=
+  WideSubcategory.inclusion (prescr Z)
 
 lemma functor_dil_to_loc : faithful := by sorry
 
