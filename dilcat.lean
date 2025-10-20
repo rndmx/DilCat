@@ -338,7 +338,7 @@ lemma fraction_in_loc_full_comp (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = 
      sorry) ≫
       fraction_in_loc_full Z (composition Z F F' compat) ≫
        eqToHom (by sorry)  := by
-            sorry -- longer proof but nothing hard 
+            sorry -- longer proof but nothing hard
 
 
 def prescr : MorphismProperty (CenterMorphismProperty Z).Localization := fun X Y f =>
@@ -400,7 +400,7 @@ instance prescr_multiplicative : MorphismProperty.IsMultiplicative (prescr Z) wh
 
 
 def Dil := WideSubcategory  (prescr Z)
-
+/-
 instance : Category (Dil Z) :=
   WideSubcategory.category (prescr Z)
 
