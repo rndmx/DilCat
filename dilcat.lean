@@ -239,10 +239,10 @@ def composition (F F' : Fraction Z) (compat : F.Xs (F.k + 1) = F'.Xs 0) : Fracti
       {exfalso
        contradiction}
       {simp[abs]
-       have htr :  Z.dom (F'.i (↑j - F.k)) = F'.Xs ((↑j - F.k)+1):=  by simp[F'.n_dom ⟨(↑j - F.k), by sorry  ⟩]
+       have htr :  Z.dom (F'.i (↑j - F.k)) = F'.Xs ((↑j - F.k)+1):=  by simp[F'.n_dom ⟨(↑j - F.k), by sorry  ⟩] --use j : { j // j < F.k + F'.k }
        simp[htr]
        have hjk : F.k ≤ ↑j := Nat.le_of_not_lt h
-       have hsub : ↑j - F.k + 1 = ↑j + 1 - F.k := by sorry
+       have hsub : ↑j - F.k + 1 = ↑j + 1 - F.k := by sorry --trivial
        simp[hsub]}},
 
 
@@ -257,10 +257,10 @@ def composition (F F' : Fraction Z) (compat : F.Xs (F.k + 1) = F'.Xs 0) : Fracti
            exact hgc
          }
          { simp[ppz]
-           have erer : Z.cod (F'.i (↑j - F.k)) = F'.Ys (↑j - F.k) := by simp[F'.n_cod ⟨(↑j - F.k), by sorry ⟩]
+           have erer : Z.cod (F'.i (↑j - F.k)) = F'.Ys (↑j - F.k) := by simp[F'.n_cod ⟨(↑j - F.k), by sorry ⟩] --use j : { j // j < F.k + F'.k }
            exact erer},
 
-  n_in_N := by sorry
+  n_in_N := by sorry -- use sieve property: its stabel by precomposition
 
   a:= if ha : (F'.k)=0  then
       eqToHom (by
@@ -344,24 +344,28 @@ lemma fraction_in_loc_full_comp (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = 
 def prescr : MorphismProperty (CenterMorphismProperty Z).Localization := fun X Y f =>
        ∃ (F : Fraction Z), f = eqToHom (by sorry) ≫ fraction_in_loc_full Z F ≫ eqToHom (by sorry)
 
-instance prescr_multiplicative : IsMultiplicative (prescr Z) where
+def prescr_id_mem : ∀ X : (CenterMorphismProperty Z).Localization, prescr Z (𝟙 X) := by sorry
+
+def prescr_comp_mem : ∀ {X Y P : (CenterMorphismProperty Z).Localization}
+    {f : X ⟶ Y} {g : Y ⟶ P}, prescr Z f → prescr Z g → prescr Z (f ≫ g) := by sorry
+
+
+instance prescr_multiplicative : MorphismProperty.IsMultiplicative (prescr Z) where
   id_mem := by
-    intro X
-    -- the identity morphism is represented by the "trivial" fraction with k=0, X0=X, Y0=X, n0=𝟙 X, a=𝟙 X
-    use ⟨0, fun n => X, fun n => X, fun j => sorry, fun j => sorry, fun j => sorry, fun j => sorry, 𝟙 X, fun j => sorry⟩
-    simp  -- fills the eqToHom placeholders
-    sorry
+   --prescr_id_mem
+   sorry
   comp_mem := by
-    intros X Y Z f g ⟨F, hf⟩ ⟨F', hg⟩
-    -- use lemma fraction_in_loc_full_comp to compose the fractions
-    exact Eq.symm (by simp [hf, hg])
-    sorry 
+  --prescr_comp_mem
+    sorry
 
 
 def Dil := WideSubcategory  (prescr Z)
 
 
+def functor_dil_to_loc : Dil Z  ⥤ (CenterMorphismProperty Z).Localization :=
+  wideSubcategoryInclusionFunctor (prescr Z)
 
+lemma functor_dil_to_loc : faithful := by sorry
 
 
 /-- Functor from C to DilZ -/
