@@ -13,6 +13,7 @@ import Init.Data.Nat.Basic
 import Init.Data.Int.Order
 import Mathlib.Data.Nat.Basic
 import Mathlib.Data.Real.Basic
+import Mathlib.CategoryTheory.Widesubcategory
 noncomputable section
 
 open CategoryTheory
@@ -323,82 +324,31 @@ lemma fraction_lemma (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = F'.Xs 0):
           simp[likj]    }
 
 
+
+
+
+
 lemma fraction_in_loc_full_comp (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = F'.Xs 0):
   fraction_in_loc_full Z F ≫
    eqToHom (congrArg (objEquiv (CenterMorphismProperty Z)) compat) ≫
     fraction_in_loc_full Z F' =
-     eqToHom (by sorry) ≫
+     eqToHom (by
+     simp only [objEquiv_apply]
+     sorry) ≫
       fraction_in_loc_full Z (composition Z F F' compat) ≫
        eqToHom (by sorry)  := by
             sorry
 
-def mor_dil (X Y : (CenterMorphismProperty Z).Localization) : Set (X ⟶ Y) :=
-  { f | ∃ (F : Fraction Z),
-      objEquiv (CenterMorphismProperty Z) (F.Xs 0) = X ∧
-      objEquiv (CenterMorphismProperty Z) (F.Xs (F.k + 1)) = Y ∧
-      f = eqToHom (by sorry) ≫  fraction_in_loc_full Z F ≫ eqToHom (by sorry)}
+
+def prescr : MorphismProperty (CenterMorphismProperty Z).Localization := fun X Y f =>
+       ∃ (F : Fraction Z), f = eqToHom (by sorry) ≫ fraction_in_loc_full Z F ≫ eqToHom (by sorry)
 
 
-def mor_fra (X Y : C) (f : X ⟶ Y) : Fraction Z :=
-{ k := 0,
-  Xs := fun n => if n = 0 then X else Y,
-  Ys := fun n => if n = 0 then X else Y,
-  i := fun _ => Classical.choice Z.nonempty, -- Use the nonempty proof to select an element of Z.I
-  n_orig := fun j => nomatch j, -- Replace with the identity morphism or another appropriate term
-  n_dom :  by nomatch j,
-  n_cod : by nomatch j,
-  n := fun j => by nomatch j,
-  n_in_N := fun j => by by nomatch j,
-  a := f,
-  a_dom := rfl }
-
-def Identity (X:C) : Fraction Z := mor_fra Z X X (𝟙 X)
-
-
-
-/-- Category instance for DilCat -/
-instance Dil [Category (CenterMorphismProperty Z).Localization] :
-          Category ((CenterMorphismProperty Z).Localization) where
-  Hom X Y := mor_dil Z X Y
-  id X := { val := (𝟙 X : @Quiver.Hom (CenterMorphismProperty Z).Localization (CenterMorphismProperty Z).instCategoryLocalization.toQuiver X X), property := by sorry }
-  comp f g := { val := f.val ≫ g.val, property := by sorry  }
-  id_comp f := by
-    apply Subtype.ext
-    exact Category.id_comp f.val
-  comp_id f := by
-    apply Subtype.ext
-    exact Category.comp_id f.val
-  assoc f g h := by
-    apply Subtype.ext
-    exact Category.assoc f.val g.val h.val
+def Dil := WideSubcategory  (presc Z)
 
 
 
 
-/-- Construct a fraction from a morphism -/
-def mor_fra (X Y : C) (f : X ⟶ Y) : Fraction Z :=
-{ k := 0,
-  Xs := fun n => if n = 0 then X else Y,
-  Ys := fun n => if n = 0 then X else Y,
-  i := fun _ => Classical.choice Z.nonempty,
-  n_orig := fun j => nomatch j,
-  n_dom := by nomatch j,
-  n_cod := by nomatch j,
-  n := fun j => by nomatch j,
-  n_in_N := fun j => by nomatch j,
-  a := f,
-  a_dom := rfl }
-
-def Loc := (CenterMorphismProperty Z).Localization
-
-instance : Category (Loc Z) := (CenterMorphismProperty Z).instCategoryLocalization
-
-/-- Functor from Loc Z to Dil Z -/
-def functor_dil_to_loc : Loc Z ⥤ Dil Z where
-  obj X := { obj := X }
-  map {X Y} f := { }
-  id_map X :=
-  map_comp {X Y Z} f g :=
 
 /-- Functor from C to DilZ -/
 def functor_cat_to_dil : C ⥤ Dil Z where
