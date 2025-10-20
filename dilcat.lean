@@ -14,6 +14,7 @@ import Init.Data.Int.Order
 import Mathlib.Data.Nat.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.CategoryTheory.Widesubcategory
+import Mathlib.CategoryTheory.MorphismProperty.Composition
 noncomputable section
 
 open CategoryTheory
@@ -343,8 +344,21 @@ lemma fraction_in_loc_full_comp (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = 
 def prescr : MorphismProperty (CenterMorphismProperty Z).Localization := fun X Y f =>
        ∃ (F : Fraction Z), f = eqToHom (by sorry) ≫ fraction_in_loc_full Z F ≫ eqToHom (by sorry)
 
+instance prescr_multiplicative : IsMultiplicative (prescr Z) where
+  id_mem := by
+    intro X
+    -- the identity morphism is represented by the "trivial" fraction with k=0, X0=X, Y0=X, n0=𝟙 X, a=𝟙 X
+    use ⟨0, fun n => X, fun n => X, fun j => sorry, fun j => sorry, fun j => sorry, fun j => sorry, 𝟙 X, fun j => sorry⟩
+    simp  -- fills the eqToHom placeholders
+    sorry
+  comp_mem := by
+    intros X Y Z f g ⟨F, hf⟩ ⟨F', hg⟩
+    -- use lemma fraction_in_loc_full_comp to compose the fractions
+    exact Eq.symm (by simp [hf, hg])
+    sorry 
 
-def Dil := WideSubcategory  (presc Z)
+
+def Dil := WideSubcategory  (prescr Z)
 
 
 
