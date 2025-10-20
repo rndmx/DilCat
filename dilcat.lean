@@ -246,6 +246,7 @@ def composition (F F' : Fraction Z) (compat : F.Xs (F.k + 1) = F'.Xs 0) : Fracti
 
 
 
+
   n_cod := by
          intro j
          by_cases ppz : ↑j < F.k
@@ -257,28 +258,70 @@ def composition (F F' : Fraction Z) (compat : F.Xs (F.k + 1) = F'.Xs 0) : Fracti
            have erer : Z.cod (F'.i (↑j - F.k)) = F'.Ys (↑j - F.k) := by simp[F'.n_cod ⟨(↑j - F.k), by sorry ⟩]
            exact erer},
 
-  n_in_N := by
-      intro j
-      by_cases  h : ↑j < F.k
-      {simp[h]
-       by_cases hle : ↑j < F.k
-       { by
-         exact F.n_in_N ⟨j, by exact hle ⟩ }
-       { exfalso
-         contradiction } }
-       {}
-       }
-      {},
+  n_in_N := by sorry
 
-    --use seeve property,
+  a:= if ha : (F'.k)=0  then
+      eqToHom (by
+    by_cases h : F.k + F'.k ≤ F.k
+    {
+      have F'_le_zero : F'.k ≤ 0 := Nat.le_of_add_le_add_left h
+      have F'_eq_zero : F'.k = 0 := Nat.eq_zero_of_le_zero F'_le_zero
+      simp[h]
+      simp[F'_eq_zero]
+    }
+    { exfalso
+      have hsum : F.k + F'.k > F.k := Nat.lt_of_not_le h
+      apply h
+      have sf: F'.k >0 := Nat.lt_of_add_lt_add_left hsum
+      have gi : F'.k ≠ 0 := by sorry  ---use sf
+      contradiction
+    }) ≫ F.a ≫ eqToHom (by
+           simp[ha]
+           exact compat
+           ) ≫ F'.a ≫ eqToHom (by
+             by_cases h : F.k + F'.k + 1 ≤ F.k
+             {exfalso
+              linarith
+               }
+             {simp[h]
+              simp[ha]}
+               )
+    else
+      eqToHom (by
+         by_cases  h : F.k + F'.k ≤ F.k
+         {exfalso
+          have eui : F'.k >0 := by exact Nat.pos_of_ne_zero ha
+          linarith}
+         {simp[h]})≫ F'.a ≫ eqToHom (by
+                             by_cases h : F.k + F'.k ≤ F.k
+                             {exfalso
+                              have eui : F'.k >0 := by exact Nat.pos_of_ne_zero ha
+                              linarith}
+                             {by_cases h1 : F.k + F'.k + 1 ≤ F.k
+                              {exfalso
+                               linarith
+                               }
+                              {simp[h1]
+                               have likj:   F'.k + 1  =F.k + F'.k + 1 - F.k := by sorry -- trivial f-f=0
+                               simp[likj]}
+                              }          ),
 
-  a := by sorry, -- F'.a,          -- final arrow comes from the second fraction
-  a_dom := by sorry } --F'.a_dom }/--/ -- must match, ensure domain compatibility-/
+
+  a_dom := by sorry }
 
 lemma fraction_lemma (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = F'.Xs 0):
   F'.Xs (F'.k + 1) =
      (composition Z F F' compat).Xs
-       ( (composition Z F F' compat).k +1):= by sorry
+       ( (composition Z F F' compat).k +1):= by
+        simp [composition]
+        by_cases h : F.k + F'.k + 1 ≤ F.k
+        { simp [h]
+          exfalso
+          linarith }
+        { simp [h]
+          have likj:   F'.k + 1  =F.k + F'.k + 1 - F.k := by sorry  -- trivial f-f=0}
+          simp[likj]    }
+
 
 lemma fraction_in_loc_full_comp (F F' : Fraction Z)  (compat : F.Xs (F.k + 1) = F'.Xs 0):
   fraction_in_loc_full Z F ≫
