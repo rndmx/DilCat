@@ -239,13 +239,29 @@ theorem CatToDila_image_sieve_le_singleton (i : Z.I) :
       _ = g ≫ (CenterMorphismProperty Z).Q.map h := by
               rfl
 
-
-
-
-section RelativeLocalization
+lemma GeneratedCategory_morphism_induction
+    (P :
+      ∀ {X Y : GeneratedCategory Z},
+        (f : X ⟶ Y) → Prop)
+    (h_id :
+      ∀ X, P (𝟙 X))
+    (h_comp :
+      ∀ {X Y W}
+        (f : X ⟶ Y) (g : Y ⟶ W),
+        P f → P (f ≫ g)) :
+    ∀ {X Y : GeneratedCategory Z}
+      (f : X ⟶ Y),
+      P f := by
+  intro X Y f
+  apply CategoryTheory.Paths.induction
+  · intro X
+    exact h_id X
+  · intro u v w p q hp
+    exact h_comp p ((Paths.of (GeneratorObjects Z)).map q) hp
 
 variable {D : Type u} [Category.{v} D]
 variable (F : C ⥤ D)
+
 
 /-- Morphisms in D obtained as images of the chosen central morphisms of C. -/
 def IsImageCenterMor
@@ -405,84 +421,178 @@ theorem exists_Dila_factor
       hInv
 
 
-lemma Dila_obj_generated (X : Dila Z) :
-    ∃ Y : GeneratedCategory Z,
-      Nonempty ((GeneratedToLocalization Z).obj Y ≅ X.obj) := by
-  exact X.property
-
-lemma Dila_hom_from_generated
-    {X Y : Dila Z} (f : X ⟶ Y) :
-    ∃ (f' : X.obj ⟶ Y.obj),
-      f = f' := by
-  exact ⟨f, rfl⟩
 
 
-lemma Dila_functor_ext
-    (G₁ G₂ : Dila Z ⥤ ImageCenterLocalization Z F)
-    (h_obj :
-      ∀ X : Dila Z, G₁.obj X = G₂.obj X)
-    (h_map :
-      ∀ {X Y : Dila Z} (f : X ⟶ Y),
-        G₁.map f =
-          eqToHom (h_obj X) ≫
-          G₂.map f ≫
-          eqToHom (h_obj Y).symm) :
-    G₁ = G₂ := by
-  apply CategoryTheory.Functor.ext
-  · intro X Y f
-    exact h_map f
+lemma DilaToLoc_faithful :
+    (DilaToLoc Z).Faithful := by
+  change (GeneratedToLocalization Z).essImage.ι.Faithful
+  infer_instance
 
-lemma Dila_functor_ext_generated
+
+lemma Dila_factor_unique_obj_on_C
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i))))
     (G₁ G₂ :
-        Dila Z ⥤ ImageCenterLocalization Z F)
+      Dila Z ⥤ ImageCenterLocalization Z F)
+    (h₁ :
+      CatToDila Z ⋙ G₁ =
+        F ⋙ ImageCenterLocalizationFunctor Z F)
+    (h₂ :
+      CatToDila Z ⋙ G₂ =
+        F ⋙ ImageCenterLocalizationFunctor Z F) :
+    ∀ X : C,
+      G₁.obj ((CatToDila Z).obj X) =
+      G₂.obj ((CatToDila Z).obj X) := by
+
+  intro X
+
+  have h₁X :
+      G₁.obj ((CatToDila Z).obj X) =
+        (F ⋙ ImageCenterLocalizationFunctor Z F).obj X :=
+    congrArg (fun H => H.obj X) h₁
+
+  have h₂X :
+      G₂.obj ((CatToDila Z).obj X) =
+        (F ⋙ ImageCenterLocalizationFunctor Z F).obj X :=
+    congrArg (fun H => H.obj X) h₂
+
+  exact h₁X.trans h₂X.symm
+
+
+lemma Dila_factor_unique_mor_on_C
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i))))
+    (G₁ G₂ :
+      Dila Z ⥤ ImageCenterLocalization Z F)
+    (h₁ :
+      CatToDila Z ⋙ G₁ =
+        F ⋙ ImageCenterLocalizationFunctor Z F)
+    (h₂ :
+      CatToDila Z ⋙ G₂ =
+        F ⋙ ImageCenterLocalizationFunctor Z F) :
+    ∀ {X Y : C} (f : X ⟶ Y),
+      G₁.map ((CatToDila Z).map f) =
+        eqToHom
+          (Dila_factor_unique_obj_on_C
+            Z F hfaith hsieve G₁ G₂ h₁ h₂ X)
+        ≫
+        G₂.map ((CatToDila Z).map f)
+        ≫
+        eqToHom
+          (Dila_factor_unique_obj_on_C
+            Z F hfaith hsieve G₁ G₂ h₁ h₂ Y).symm := by
+        intro X Y f
+
+        -- prove equality in the ordinary category
+        sorry
+
+
+lemma Dila_factor_unique_fraction
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i))))
+    (G₁ G₂ :
+      Dila Z ⥤ ImageCenterLocalization Z F)
+    (h₁ :
+      CatToDila Z ⋙ G₁ =
+        F ⋙ ImageCenterLocalizationFunctor Z F)
+    (h₂ :
+      CatToDila Z ⋙ G₂ =
+        F ⋙ ImageCenterLocalizationFunctor Z F) :
+    ∀ (i : Z.I) (X : C)
+      (n : X ⟶ Z.cod i)
+      (hn : Z.N i n),
+      G₁.map
+        (fraction_in_loc_single Z
+          ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
+      =
+      eqToHom
+        (     by
+                  exact Dila_factor_unique_obj_on_C
+                    Z F hfaith hsieve G₁ G₂ h₁ h₂ X)
+      ≫
+      G₂.map
+        (fraction_in_loc_single Z
+          ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
+      ≫
+      eqToHom
+       ( by
+  exact (Dila_factor_unique_obj_on_C
+    Z F hfaith hsieve G₁ G₂ h₁ h₂ (Z.dom i)).symm ):= by
+    sorry
+
+lemma DilaToLoc_map_injective
+    {X Y : Dila Z}
+    (f g : X ⟶ Y)
+    (h : (DilaToLoc Z).map f = (DilaToLoc Z).map g) :
+    f = g := by
+    sorry
+
+def DilaObjOfLoc
+    (X : (CenterMorphismProperty Z).Localization)
+    (hX :
+      (GeneratedToLocalization Z).essImage X) :
+      Dila Z :=
+  ⟨X, hX⟩
+
+
+lemma Generated_factor_unique_map
+    (G₁ G₂ :
+      Dila Z ⥤ ImageCenterLocalization Z F)
     (h_obj :
       ∀ X : Dila Z, G₁.obj X = G₂.obj X)
-    (h_orig :
+    (h_mor :
       ∀ {X Y : C} (f : X ⟶ Y),
         G₁.map ((CatToDila Z).map f) =
-          eqToHom (h_obj _ ) ≫
+          eqToHom (h_obj ((CatToDila Z).obj X)) ≫
           G₂.map ((CatToDila Z).map f) ≫
-          eqToHom (h_obj _).symm)
-    (h_frac :
-      ∀ (p : CenterSievePair Z),
-        G₁.map
-          (fraction_in_loc_single Z p) =
-        eqToHom (h_obj _) ≫
-          G₂.map
-            (fraction_in_loc_single Z p) ≫
-          eqToHom (h_obj _).symm) :
-    G₁ = G₂ := by
-
-  apply CategoryTheory.Functor.ext
-  · intro X Y f
-
-    obtain ⟨X', hX⟩ := Dila_obj_generated Z X
-    obtain ⟨Y', hY⟩ := Dila_obj_generated Z Y
-
-    subst hX
-    subst hY
-
-    -- Every morphism of Dila comes from the full subcategory
-    -- of the essential image, hence from a path in GeneratedCategory.
-    obtain ⟨g, rfl⟩ := Dila_hom_from_generated Z f
-
-    induction g with
-    | nil =>
-        simp
-    | cons g h ih =>
-        simp [Category.assoc, ih]
-    | hom g =>
-        rcases g.property with gfrac | gorig
-        · -- fraction generator
-          rcases gfrac with ⟨p, rfl⟩
-          exact h_frac p
-        · -- original generator
-          rcases gorig with ⟨X, Y, a, rfl⟩
-          exact h_orig a
+          eqToHom (h_obj ((CatToDila Z).obj Y)).symm)
+    (h_fraction :
+  ∀ (i : Z.I) (X : C)
+    (n : X ⟶ Z.cod i)
+    (hn : Z.N i n),
+    G₁.map
+      (fraction_in_loc_single Z
+        ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
+    =
+    eqToHom
+      (h_obj
+        ((⟨objEquiv (CenterMorphismProperty Z) X,
+          Q_obj_mem_essImage Z X⟩ : Dila Z)))
+      ≫
+    G₂.map
+      (fraction_in_loc_single Z
+        ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
+    ≫
+    eqToHom
+      (h_obj
+        ((⟨objEquiv (CenterMorphismProperty Z) (Z.dom i),
+          Q_obj_mem_essImage Z (Z.dom i)⟩ : Dila Z))).symm)
+    {X Y : Dila Z}
+    (f : X ⟶ Y) :
+    G₁.map f =
+      eqToHom (h_obj X) ≫
+      G₂.map f ≫
+      eqToHom (h_obj Y).symm := by
+   sorry
 
 
 
-  theorem Dila_factor_unique
+theorem Dila_factor_unique
     (hfaith :
       (ImageCenterLocalizationFunctor Z F).Faithful)
     (hsieve :
@@ -499,93 +609,26 @@ lemma Dila_functor_ext_generated
       CatToDila Z ⋙ G₂ =
         F ⋙ ImageCenterLocalizationFunctor Z F) :
     G₁ = G₂ := by
+  have h_obj :
+      ∀ X : Dila Z, G₁.obj X = G₂.obj X := by
+    sorry
 
   apply CategoryTheory.Functor.ext
+  · intro X Y f
+    exact Generated_factor_unique_map
+        Z F G₁ G₂
+        h_obj
+        (by
+          intro X Y f
+          exact Dila_factor_unique_mor_on_C
+            Z F hfaith hsieve G₁ G₂ h₁ h₂ f)
+        (by
+          intro i X n hn
+          exact Dila_factor_unique_fraction
+            Z F hfaith hsieve G₁ G₂ h₁ h₂ i X n hn)
+        f
 
   · intro X
+    exact h_obj X
 
-    obtain ⟨Y, e⟩ := Dila_generated_by_C Z X
-
-    rw [← e.hom_inv_id]
-
-    have hobj :
-        G₁.obj ((CatToDila Z).obj Y) =
-          G₂.obj ((CatToDila Z).obj Y) := by
-      simpa using congrArg
-        (fun H => H.obj Y)
-        h₁.trans h₂.symm
-
-    simpa [e] using hobj
-
-
-  · intro X Y f
-
-    apply Subsingleton.elim
-
-
-    sorry
 end RelativeLocalization
-
-
-/--/
-def is_in_imag (D: Cat ) (F: C ⥤ D) (f : Σ X Y : D, X ⟶ Y) : Prop :=
-  ∃ i : Z.I, f = ⟨F.obj (Z.dom i), F.obj (Z.cod i), F.map (Z.mor i)⟩
-
-
-def CenterimagProperty (D: Cat ) (Funct: C ⥤ D) : MorphismProperty D :=
-    fun X Y f => is_in_imag Z D Funct ⟨X, Y, f⟩
-
-def image_Sieve (D : Cat)  (Funct : C ⥤ D) (i : Z.I) :
-    Sieve (Funct.obj (Z.cod i)) :=
-  Sieve.functorPushforward Funct (Z.N i)
-
-def image_mor_sieve (D : Cat) (Funct : C ⥤ D) (i : Z.I) :
-    CategoryTheory.Sieve (Funct.obj (Z.cod i)) :=
-  CategoryTheory.Sieve.generateSingleton (Funct.map (Z.mor i))
-
-
-lemma triangle (Z: Center C) :  (CenterMorphismProperty Z).Q =
-  functor_cat_to_dil Z ≫ functor_dil_to_loc Z := by sorry
-
-lemma facto_exists (D: Cat ) (Funct: C ⥤ D)
-  (reg: Faithful ((CenterimagProperty Z D Funct).Q)) (i : Z.I) (n : (Z.N i).arrows)
-  (he :   image_Sieve Z D Funct i ≤ image_mor_sieve Z D Funct i)  :
-  ∃ b : Funct.obj dom n → Funct.obj dom Z.mor ∧ Funct.hom n = b ≫ Funct.hom Z.mor i := by sorry
-
-
-lemma facto_unique (D: Cat ) (Funct: C ⥤ D)
-  (reg: Faithful ((CenterimagProperty Z D Funct).Q)) (i : Z.I) (n : (Z.N i).arrows)
-  (he :   image_Sieve Z D Funct i ≤ image_mor_sieve Z D Funct i)
-   (b : Funct.obj dom n → Funct.obj dom Z.mor ∧ Funct.hom n = b ≫ Funct.hom Z.mor i)
-    (b': Funct.obj dom n → Funct.obj dom Z.mor ∧ Funct.hom n = b' ≫ Funct.hom Z.mor i) :b=b' := by
-        sorry
-
-
-
-theorem univ_prop (D: Cat ) (F: C ⥤ D)  (reg: Faithful ((CenterimagProperty Z D F).Q))
-  (hs : ∀ i : Z.I,  image_Sieve Z D F i ≤ image_mor_sieve Z D F i) :
-  ∃! (G : Dil Z ⥤ D), F ⋙ G = functor_cat_to_dil Z  := by
-   -- adapt the proof in case of dilatations of rings in the Proj file
-    sorry
-
-
-
-/-
-def inv_in_loc (i : Z.I) :
-  ((LocalizationFunctor Z).obj (Z.cod i) ⟶ (LocalizationFunctor Z).obj (Z.dom i)) :=
-  Localization.Construction.wInv (Z.mor i) ⟨i, rfl⟩ -/
-
-
-
-/--/
-lemma triangle (Z: Center C) :  (CenterMorphismProperty Z).Q =
-  functor_cat_to_dil Z ≫ functor_dil_to_loc Z := by sorry
-
-lemma facto_exists (Z: Center C)  (i : Z.I) (n : (Z.N i).arrows) :
-  ∃ b : Dil dom n → Dil dom Z.mor ∧ n = b ≫ Z.d i := by
-        sorry
-
-lemma facto_unique (Z: Center C)  (i : Z.I) (n : (Z.N i).arrows) (b, b': dom n → dom Z.mor i) :
-  (hb: ) (hb': ) : b=b':= by
-        sorry
--/
