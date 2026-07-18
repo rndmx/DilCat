@@ -36,7 +36,7 @@ structure Center (C : Type u) [Category.{v} C] where
   mor : ∀ i : I, dom i ⟶ cod i
   N   : ∀ i : I, Sieve (C := C) (cod i)
 
-namespace Dilatation
+
 
 variable {C : Type u} [Category.{v} C]
 variable (Z : Center C)
@@ -627,8 +627,3 @@ theorem Dila_factor_unique
           exact Dila_factor_unique_fraction
             Z F hfaith hsieve G₁ G₂ h₁ h₂ i X n hn)
         f
-
-  · intro X
-    exact h_obj X
-
-end RelativeLocalization
