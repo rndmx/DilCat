@@ -463,111 +463,7 @@ lemma exists_unique_factor_D
 
   exact unique_factor_D Z F hfaith i Y q' q (by
     rw [hq', hq])
-/--/
-instance DilaToLoc_full :
-    (DilaToLoc Z).Full := by
-  change (GeneratedToLocalization Z).essImage.ι.Full
-  infer_instance
-def generatedDilaObj (A : GeneratedCategory Z) : Dila Z :=
-{
-  obj := (GeneratedToLocalization Z).obj A
-  property := by
-    refine ⟨A, ?_⟩
-    exact ⟨Iso.refl _⟩
-}
 
-
-
-def generatedDilaMap
-    {A B : GeneratedCategory Z}
-    (g : A ⟶ B) :
-    generatedDilaObj Z A ⟶ generatedDilaObj Z B :=
-by
-  apply (DilaToLoc Z).preimage
-  exact (GeneratedToLocalization Z).map g
-
-
-lemma DilaToLoc_preimage_generatedDilaMap
-    {A B : GeneratedCategory Z}
-    (g : A ⟶ B) :
-    (DilaToLoc Z).map (generatedDilaMap Z g) =
-      (GeneratedToLocalization Z).map g := by
-   sorry
-
-
-lemma Dila_morphism_induction
-    (P :
-      ∀ {X Y : Dila Z},
-        (f : X ⟶ Y) → Prop)
-    (h_id :
-      ∀ X, P (𝟙 X))
-    (h_comp :
-      ∀ {X Y W : Dila Z}
-        (f : X ⟶ Y) (g : Y ⟶ W),
-        P f → P (f ≫ g))
-    (h_gen :
-        ∀ {A B : GeneratedCategory Z}
-          (g : A ⟶ B),
-          P (generatedDilaMap Z g)) :
-    ∀ {X Y : Dila Z} (f : X ⟶ Y), P f := by
-
-  letI : (DilaToLoc Z).Full := DilaToLoc_full Z
-
-  intro X Y f
-
-  rcases X.property with ⟨X', ⟨eX⟩⟩
-  rcases Y.property with ⟨Y', ⟨eY⟩⟩
-
-  let g :
-      (DilaToLoc Z).obj X ⟶ (DilaToLoc Z).obj Y :=
-    (DilaToLoc Z).map f
-
-  let f' :
-    generatedDilaObj Z X' ⟶ generatedDilaObj Z Y' :=
-      by
-        exact eX.hom ≫ g ≫ eY.inv
-
-  let k :
-      generatedDilaObj Z X' ⟶ generatedDilaObj Z Y' :=
-    (DilaToLoc Z).preimage
-      ((DilaToLoc Z).map f')
-
-  have hk :
-      (DilaToLoc Z).map k =
-        (DilaToLoc Z).map f' := by
-    exact (DilaToLoc Z).map_preimage _
-
-
-  have hf' :
-    P f' := by
-
-      sorry
-
-  have hf :
-      f =
-        (DilaToLoc Z).preimage f' := by
-    apply (DilaToLoc Z).map_injective
-    simpa [g] using hf'
-
-  rw [hf]
-
-  apply GeneratedCategory_morphism_induction
-      (Z := Z)
-      (fun {A B} g =>
-        P ((DilaToLoc Z).preimage
-          ((GeneratedToLocalization Z).map g)))
-
-  · intro A
-    exact h_id _
-
-  · intro A B C f g hf
-    exact h_comp _ _ hf
-
-  · intro A B g
-    exact h_gen g
-
-
--/
 
 theorem exists_Dila_factor
     (hfaith :
@@ -623,9 +519,6 @@ theorem exists_Dila_factor
     exact Localization.Construction.fac _ _
 
 
-lemma DilaToLoc_faithful :
-    (DilaToLoc Z).Faithful := by
-    sorry
 
 
 lemma Dila_factor_unique_on_C
@@ -668,14 +561,6 @@ lemma Dila_factor_unique_fraction
 
 
 
-
-
-lemma DilaToLoc_map_injective
-    {X Y : Dila Z}
-    (f g : X ⟶ Y)
-    (h : (DilaToLoc Z).map f = (DilaToLoc Z).map g) :
-    f = g := by
-    sorry
 
 lemma Generated_factor_unique_map
     (G₁ G₂ :
@@ -751,35 +636,6 @@ lemma Generated_factor_unique_map
 
 
 
-
-
-lemma Dila_obj_is_generated
-    (X : Dila Z) :
-    ∃ Y : GeneratedCategory Z,
-      Nonempty ((GeneratedToLocalization Z).obj Y ≅ X.1) := by
-  exact X.2
-
-lemma test_map
-    {C D : Type*}
-    [Category C] [Category D]
-    (F₁ F₂ : C ⥤ D)
-    (h : F₁ = F₂) :
-    ∀ {X Y : C} (f : X ⟶ Y),
-      HEq (F₁.map f) (F₂.map f) := by
-  intro X Y f
-  cases h
-  rfl
-
-lemma GeneratedToLocalization_essImage_eq_top
-    (X : (CenterMorphismProperty Z).Localization) :
-    (GeneratedToLocalization Z).essImage X := by
-  refine ⟨X, ?_⟩
-  exact ⟨Iso.refl _⟩
-
-lemma Dila_obj_exists
-    (X : (CenterMorphismProperty Z).Localization) :
-    ∃ Y : Dila Z, Y.1 = X := by
-  refine ⟨⟨X, GeneratedToLocalization_essImage_eq_top Z X⟩, rfl⟩
 
 
 lemma localization_obj_eq_Q_obj
