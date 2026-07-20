@@ -25,7 +25,7 @@ open Finset
 open CategoryTheory ComposableArrows
 open CategoryTheory.Localization.Construction
 universe v u
-
+namespace CategoryTheory
 
 /-- A center in a category `C` -/
 structure Center (C : Type u) [Category.{v} C] where
@@ -62,7 +62,7 @@ def LocalizationFunctor : C ⥤ (CenterMorphismProperty Z).Localization := (Cent
 def CenterSievePair : Type (max u v) :=
   Σ i : Z.I, Σ X : C, { f : X ⟶ Z.cod i // Z.N i f }
 
-def Quiv := LocQuiver (CenterMorphismProperty Z)
+def Quv := LocQuiver (CenterMorphismProperty Z)
 
 def inv_in_path (p : CenterSievePair Z) :
     ιPaths (CenterMorphismProperty Z) (Z.cod p.1) ⟶
@@ -139,40 +139,97 @@ def GeneratedToLocalization :
     GeneratedCategory Z ⥤ (CenterMorphismProperty Z).Localization :=
          CategoryTheory.Paths.lift (forgetGenerator Z)
 
+def DilaRel :
+    HomRel (GeneratedCategory Z) :=
+  fun {X Y} f g =>
+    (GeneratedToLocalization Z).map f =
+      (GeneratedToLocalization Z).map g
+
 def Dila :=
-  (GeneratedToLocalization Z).essImage.FullSubcategory
+  CategoryTheory.Quotient (DilaRel Z)
 
-instance instCategoryDila : Category (Dila Z) :=
-  ObjectProperty.FullSubcategory.category (GeneratedToLocalization Z).essImage
+instance : Category (Dila Z) :=
+  CategoryTheory.Quotient.category _
 
-def DilaToLoc : Dila Z ⥤ (CenterMorphismProperty Z).Localization :=
-  (GeneratedToLocalization Z).essImage.ι
+def DilaToLoc :
+    Dila Z ⥤ (CenterMorphismProperty Z).Localization :=
+  CategoryTheory.Quotient.lift
+    (DilaRel Z)
+    (GeneratedToLocalization Z)
+    (by
+      intro X Y f g h
+      exact h)
 
-lemma Q_obj_mem_essImage (X : C) :
+/-lemma Q_obj_mem_essImage (X : C) :
     (GeneratedToLocalization Z).essImage
       ((CenterMorphismProperty Z).Q.obj X) := by
   refine ⟨objEquiv (CenterMorphismProperty Z) X, ?_⟩
-  exact ⟨Iso.refl _⟩
-
-def CatToDila : C ⥤ Dila Z where
-  obj X := ⟨
-    (CenterMorphismProperty Z).Q.obj X,
-    by
-      refine ⟨objEquiv (CenterMorphismProperty Z) X, ?_⟩
-      exact ⟨Iso.refl _⟩
-  ⟩
-  map {X Y} f := (CenterMorphismProperty Z).Q.map f
+  exact ⟨Iso.refl _⟩-/
 
 
-theorem CatToDila_comp_DilaToLoc :
-    CatToDila Z ⋙ DilaToLoc Z =
-      (CenterMorphismProperty Z).Q := by
-  apply CategoryTheory.Functor.ext
-  · intro X Y f
-    dsimp [CatToDila, DilaToLoc]
-    rfl
-  · dsimp [CatToDila, DilaToLoc]
+def GeneratedToDila :
+    GeneratedCategory Z ⥤ Dila Z :=
+  CategoryTheory.Quotient.functor (DilaRel Z)
+
+instance GeneratedToDila_full :
+    (GeneratedToDila Z).Full := by
+  change (CategoryTheory.Quotient.functor (DilaRel Z)).Full
+  infer_instance
+
+/-- The quiver map sending a morphism of `C` to the corresponding
+    original-morphism generator in the generator quiver. -/
+def CToGeneratorQuiver :
+    C ⥤q GeneratorObjects Z where
+  obj X := objEquiv (CenterMorphismProperty Z) X
+  map {X Y} f :=
+    ⟨(CenterMorphismProperty Z).Q.map f,
+      Or.inr ⟨X, Y, f, rfl⟩⟩
+
+def CatToDila :
+    C ⥤ Dila Z where
+  obj X :=
+    Quotient.mk ((CToGeneratorQuiver Z).obj X)
+
+  map {X Y} f :=
+    (Quotient.functor (DilaRel Z)).map
+      (Quiver.Hom.toPath ((CToGeneratorQuiver Z).map f))
+
+  map_id X := by
+    apply Quotient.sound
+    change
+      (GeneratedToLocalization Z).map
+          (Quiver.Hom.toPath
+            ⟨(CenterMorphismProperty Z).Q.map (𝟙 X), _⟩)
+        =
+      𝟙 _
     simp
+    simp [GeneratedToLocalization, forgetGenerator]
+    rfl
+
+  map_comp f g := by
+
+    apply Quotient.sound
+    change
+      (CenterMorphismProperty Z).Q.map (f ≫ g) =
+        (CenterMorphismProperty Z).Q.map f ≫
+        (CenterMorphismProperty Z).Q.map g
+    simp
+
+lemma CatToDila_comp_DilaToLoc :
+    CatToDila Z ⋙ DilaToLoc Z =
+      LocalizationFunctor Z := by
+  apply Functor.ext
+  · intro X
+    dsimp [LocalizationFunctor, CatToDila, DilaToLoc]
+    simp
+    intro Y f
+    rfl
+  · intro X
+    change
+      (GeneratedToLocalization Z).obj
+          ((CToGeneratorQuiver Z).obj X) =
+        (CenterMorphismProperty Z).Q.obj X
+    rfl
 
 def CatToDilaSieve
     {X : C} (N : Sieve (C := C) X) :
@@ -207,37 +264,71 @@ lemma fraction_comp_mor (i : Z.I) (X : C)
       ⟨i, rfl⟩)
 
 
+def fraction_in_generated (p : CenterSievePair Z) :
+    (CToGeneratorQuiver Z).obj p.2.1 ⟶
+    (CToGeneratorQuiver Z).obj (Z.dom p.1) :=
+  ⟨
+    fraction_in_loc_single Z p,
+    Or.inl ⟨p, rfl⟩
+  ⟩
+
+def fraction_in_dila_single (p : CenterSievePair Z) :
+    (CatToDila Z).obj p.2.1 ⟶
+    (CatToDila Z).obj (Z.dom p.1) :=
+  (GeneratedToDila Z).map
+    (Quiver.Hom.toPath (fraction_in_generated Z p))
 
 theorem CatToDila_image_sieve_le_singleton (i : Z.I) :
     CatToDilaSieve Z (Z.N i) ≤
       Sieve.generate (Presieve.singleton ((CatToDila Z).map (Z.mor i))) := by
+
   intro X f hf
-  dsimp [CatToDilaSieve, CatToDila, Sieve.functorPushforward] at hf
+  dsimp [CatToDilaSieve, Sieve.functorPushforward] at hf
 
   rcases hf with ⟨Y, h, g, hg, rfl⟩
+
   have hfrac :
-      fraction_in_loc_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩ ≫
-        (CatToDila Z).map (Z.mor i)
+      fraction_in_dila_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩ ≫
+          (CatToDila Z).map (Z.mor i)
       =
       (CatToDila Z).map h := by
-    exact fraction_comp_mor Z i Y h hg
-  refine ⟨
-    (CatToDila Z).obj (Z.dom i),
-    g ≫ fraction_in_loc_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩,
-    (CatToDila Z).map (Z.mor i),
-    ?_,
-    ?_
-   ⟩
-  · exact Presieve.singleton_self _
+    apply Quotient.sound
+    simp [DilaRel,
+      fraction_in_dila_single,
+      CatToDila,
+      GeneratedToLocalization,
+      forgetGenerator,
+      fraction_in_path_single,
+      inv_in_path]
+    change
+      fraction_in_loc_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩ ≫
+          (CenterMorphismProperty Z).Q.map (Z.mor i)
+        =
+      (CenterMorphismProperty Z).Q.map h
 
-  · calc
-      (g ≫ fraction_in_loc_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩) ≫ (CatToDila Z).map (Z.mor i)
-          = g ≫ (fraction_in_loc_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩ ≫ (CatToDila Z).map (Z.mor i)) := by
+    exact fraction_comp_mor Z i Y h hg
+
+
+  refine ⟨
+      (CatToDila Z).obj (Z.dom i),
+      g ≫ fraction_in_dila_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩,
+      (CatToDila Z).map (Z.mor i),
+      Presieve.singleton_self _,
+      ?_
+    ⟩
+
+  calc
+    (g ≫ fraction_in_dila_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩) ≫
+        (CatToDila Z).map (Z.mor i)
+        =
+        g ≫
+          (fraction_in_dila_single Z ⟨i, ⟨Y, ⟨h, hg⟩⟩⟩ ≫
+            (CatToDila Z).map (Z.mor i)) := by
               rw [Category.assoc]
-      _ = g ≫ (CatToDila Z).map h := by
-              simpa [Category.assoc] using congrArg (fun k => g ≫ k) hfrac
-      _ = g ≫ (CenterMorphismProperty Z).Q.map h := by
-              rfl
+
+    _ = g ≫ (CatToDila Z).map h := by
+          rw [hfrac]
+
 
 lemma GeneratedCategory_morphism_induction
     (P :
@@ -248,19 +339,27 @@ lemma GeneratedCategory_morphism_induction
     (h_comp :
       ∀ {X Y W}
         (f : X ⟶ Y) (g : Y ⟶ W),
-        P f → P (f ≫ g)) :
+        P f → P g → P (f ≫ g))
+        (h_gen :
+  ∀ {A B : GeneratorObjects Z}
+    (g : (GeneratorQuiver Z).Hom A B),
+    P (Quiver.Hom.toPath g)) :
     ∀ {X Y : GeneratedCategory Z}
-      (f : X ⟶ Y),
-      P f := by
+      (f : X ⟶ Y), P f := by
+
   intro X Y f
   apply CategoryTheory.Paths.induction
   · intro X
     exact h_id X
   · intro u v w p q hp
-    exact h_comp p ((Paths.of (GeneratorObjects Z)).map q) hp
+    exact h_comp p
+      ((Paths.of (GeneratorObjects Z)).map q)
+      hp
+      (h_gen q)
 
 variable {D : Type u} [Category.{v} D]
 variable (F : C ⥤ D)
+
 
 
 /-- Morphisms in D obtained as images of the chosen central morphisms of C. -/
@@ -364,9 +463,111 @@ lemma exists_unique_factor_D
 
   exact unique_factor_D Z F hfaith i Y q' q (by
     rw [hq', hq])
+/--/
+instance DilaToLoc_full :
+    (DilaToLoc Z).Full := by
+  change (GeneratedToLocalization Z).essImage.ι.Full
+  infer_instance
+def generatedDilaObj (A : GeneratedCategory Z) : Dila Z :=
+{
+  obj := (GeneratedToLocalization Z).obj A
+  property := by
+    refine ⟨A, ?_⟩
+    exact ⟨Iso.refl _⟩
+}
 
 
 
+def generatedDilaMap
+    {A B : GeneratedCategory Z}
+    (g : A ⟶ B) :
+    generatedDilaObj Z A ⟶ generatedDilaObj Z B :=
+by
+  apply (DilaToLoc Z).preimage
+  exact (GeneratedToLocalization Z).map g
+
+
+lemma DilaToLoc_preimage_generatedDilaMap
+    {A B : GeneratedCategory Z}
+    (g : A ⟶ B) :
+    (DilaToLoc Z).map (generatedDilaMap Z g) =
+      (GeneratedToLocalization Z).map g := by
+   sorry
+
+
+lemma Dila_morphism_induction
+    (P :
+      ∀ {X Y : Dila Z},
+        (f : X ⟶ Y) → Prop)
+    (h_id :
+      ∀ X, P (𝟙 X))
+    (h_comp :
+      ∀ {X Y W : Dila Z}
+        (f : X ⟶ Y) (g : Y ⟶ W),
+        P f → P (f ≫ g))
+    (h_gen :
+        ∀ {A B : GeneratedCategory Z}
+          (g : A ⟶ B),
+          P (generatedDilaMap Z g)) :
+    ∀ {X Y : Dila Z} (f : X ⟶ Y), P f := by
+
+  letI : (DilaToLoc Z).Full := DilaToLoc_full Z
+
+  intro X Y f
+
+  rcases X.property with ⟨X', ⟨eX⟩⟩
+  rcases Y.property with ⟨Y', ⟨eY⟩⟩
+
+  let g :
+      (DilaToLoc Z).obj X ⟶ (DilaToLoc Z).obj Y :=
+    (DilaToLoc Z).map f
+
+  let f' :
+    generatedDilaObj Z X' ⟶ generatedDilaObj Z Y' :=
+      by
+        exact eX.hom ≫ g ≫ eY.inv
+
+  let k :
+      generatedDilaObj Z X' ⟶ generatedDilaObj Z Y' :=
+    (DilaToLoc Z).preimage
+      ((DilaToLoc Z).map f')
+
+  have hk :
+      (DilaToLoc Z).map k =
+        (DilaToLoc Z).map f' := by
+    exact (DilaToLoc Z).map_preimage _
+
+
+  have hf' :
+    P f' := by
+
+      sorry
+
+  have hf :
+      f =
+        (DilaToLoc Z).preimage f' := by
+    apply (DilaToLoc Z).map_injective
+    simpa [g] using hf'
+
+  rw [hf]
+
+  apply GeneratedCategory_morphism_induction
+      (Z := Z)
+      (fun {A B} g =>
+        P ((DilaToLoc Z).preimage
+          ((GeneratedToLocalization Z).map g)))
+
+  · intro A
+    exact h_id _
+
+  · intro A B C f g hf
+    exact h_comp _ _ hf
+
+  · intro A B g
+    exact h_gen g
+
+
+-/
 
 theorem exists_Dila_factor
     (hfaith :
@@ -402,6 +603,8 @@ theorem exists_Dila_factor
       infer_instance
 
 
+
+
     let L :
         (CenterMorphismProperty Z).Localization ⥤
           ImageCenterLocalization Z F :=
@@ -414,19 +617,15 @@ theorem exists_Dila_factor
     change (CatToDila Z ⋙ DilaToLoc Z) ⋙ L =
       F ⋙ ImageCenterLocalizationFunctor Z F
 
-    rw [CatToDila_comp_DilaToLoc]
 
-    exact CategoryTheory.Localization.Construction.fac
-      (F ⋙ ImageCenterLocalizationFunctor Z F)
-      hInv
+    rw [CatToDila_comp_DilaToLoc Z]
 
-
+    exact Localization.Construction.fac _ _
 
 
 lemma DilaToLoc_faithful :
     (DilaToLoc Z).Faithful := by
-  change (GeneratedToLocalization Z).essImage.ι.Faithful
-  infer_instance
+    sorry
 
 
 lemma Dila_factor_unique_on_C
@@ -447,7 +646,7 @@ lemma Dila_factor_unique_fraction
       (n : X ⟶ Z.cod i)
       (hn : Z.N i n),
       G₁.map
-        (fraction_in_loc_single Z
+        (fraction_in_dila_single Z
           ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
       =
       eqToHom (by
@@ -456,8 +655,7 @@ lemma Dila_factor_unique_fraction
         exact this)
       ≫
       G₂.map
-        (fraction_in_loc_single Z
-          ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
+        (fraction_in_dila_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
       ≫
       eqToHom (by
         have := congrArg (fun H => H.obj (Z.dom i))
@@ -479,9 +677,6 @@ lemma DilaToLoc_map_injective
     f = g := by
     sorry
 
-
-
-
 lemma Generated_factor_unique_map
     (G₁ G₂ :
       Dila Z ⥤ D)
@@ -498,27 +693,65 @@ lemma Generated_factor_unique_map
         (n : X ⟶ Z.cod i)
         (hn : Z.N i n),
         G₁.map
-          (fraction_in_loc_single Z
-            ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
+          (fraction_in_dila_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
         =
-        eqToHom
-          (h_obj
-            ((CatToDila Z).obj X))
-        ≫
-        G₂.map
-          (fraction_in_loc_single Z
-            ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)
-        ≫
-        eqToHom
-          (h_obj
-            ((CatToDila Z).obj (Z.dom i))).symm)
+        eqToHom (h_obj ((CatToDila Z).obj X)) ≫
+          G₂.map
+            (fraction_in_dila_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩) ≫
+          eqToHom (h_obj ((CatToDila Z).obj (Z.dom i))).symm)
     {X Y : Dila Z}
     (f : X ⟶ Y) :
     G₁.map f =
       eqToHom (h_obj X) ≫
-      G₂.map f ≫
-      eqToHom (h_obj Y).symm := by
-  sorry
+        G₂.map f ≫
+        eqToHom (h_obj Y).symm := by
+  letI : (GeneratedToDila Z).Full := GeneratedToDila_full Z
+
+
+
+  obtain ⟨g, hg⟩ := (GeneratedToDila Z).map_surjective f
+
+  rw [← hg]
+
+  let P :=
+    fun {A B : GeneratedCategory Z} (k : A ⟶ B) =>
+      G₁.map ((GeneratedToDila Z).map k) =
+        eqToHom (h_obj ((GeneratedToDila Z).obj A)) ≫
+          G₂.map ((GeneratedToDila Z).map k) ≫
+          eqToHom (h_obj ((GeneratedToDila Z).obj B)).symm
+
+  have hgP : P g := by
+    apply GeneratedCategory_morphism_induction Z P
+
+    · intro A
+      simp [P]
+
+    · intro A B C f g hf hg
+      dsimp [P] at *
+      rw [Functor.map_comp]
+      rw [Functor.map_comp]
+      rw [hf, hg]
+      simp [Category.assoc]
+
+
+    · intro A B g
+      rcases g.2 with h | h
+
+      · rcases h with ⟨p, hp⟩
+
+        rcases p with ⟨i, X, n, hn⟩
+
+        sorry
+
+
+      · sorry
+        
+  exact hgP
+
+
+
+
+
 
 lemma Dila_obj_is_generated
     (X : Dila Z) :
@@ -620,3 +853,6 @@ theorem Dila_factor_unique
         exact Dila_factor_unique_fraction
           Z F G₁ G₂ h₁ h₂ i X n hn)
         f
+
+
+end CategoryTheory
