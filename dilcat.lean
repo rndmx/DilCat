@@ -548,27 +548,30 @@ theorem exists_Dila_factor
 
   let Gq : GeneratorObjects Z ⥤q D :=
     {
-      obj := fun X => sorry
+      obj := fun X => F.obj ((objEquiv (CenterMorphismProperty Z)).symm X)
 
       map := by
-        intro X Y g
+          classical
+          intro X Y g
 
-        rcases g.property with hfrac | horig
+          by_cases hfrac : FractionMorphismProperty Z g.1
 
-        · -- fraction generator
-          rcases hfrac with ⟨p, rfl⟩
+          · rcases hfrac with ⟨p, hp⟩
+            subst g
 
-          -- p : CenterSievePair Z
-          -- p = ⟨i, ⟨Y, ⟨n,hn⟩⟩⟩
+            exact
+              uniqueFactor_D Z F hfaith hsieve
+                p.1 p.2.1 p.2.2.1 p.2.2.2
 
-          exact
-            uniqueFactor_D Z F hfaith hsieve
-              p.1 p.2.1 p.2.2.1 p.2.2.2
+          · have horig :
+              IsOriginalMor Z ⟨X, Y, g.1⟩ :=
+            g.property.resolve_left hfrac
 
-        · -- original generator
-          rcases horig with ⟨X, Y, f, rfl⟩
+            rcases horig with ⟨X₀, Y₀, f, hf⟩
 
-          exact F.map f
+            subst hf
+
+            exact F.map f
     }
 
 
@@ -606,7 +609,7 @@ theorem exists_Dila_factor
   ·
     sorry
 
-   
+
 lemma Dila_factor_unique_on_C
     (G₁ G₂ : Dila Z ⥤ D)
     (h₁ : CatToDila Z ⋙ G₁ = F)
