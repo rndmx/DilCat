@@ -528,11 +528,28 @@ lemma Dila_factor_unique_on_C
     CatToDila Z ⋙ G₁ = CatToDila Z ⋙ G₂ := by
   exact h₁.trans h₂.symm
 
+lemma map_eq_of_agree_on_C
+    {X Y : C}
+    (G₁ G₂ : Dila Z ⥤ D)
+    (h₁ : CatToDila Z ⋙ G₁ = F)
+    (h₂ : CatToDila Z ⋙ G₂ = F)
+    (f : X ⟶ Y) :
+    G₁.map ((CatToDila Z).map f) =
+      eqToHom
+        (congrArg (fun H => H.obj X)
+          (h₁.trans h₂.symm)) ≫
+        G₂.map ((CatToDila Z).map f) ≫
+      eqToHom
+        (congrArg (fun H => H.obj Y)
+          (h₁.trans h₂.symm)).symm := by
 
+  apply Functor.congr_hom (h₁.trans h₂.symm)
 
 
 lemma Dila_factor_unique_fraction
     (G₁ G₂ : Dila Z ⥤ D)
+    (hfaith :
+    (ImageCenterLocalizationFunctor Z F).Faithful)
     (h₁ : CatToDila Z ⋙ G₁ = F)
     (h₂ : CatToDila Z ⋙ G₂ = F) :
     ∀ (i : Z.I) (X : C)
@@ -553,8 +570,141 @@ lemma Dila_factor_unique_fraction
       eqToHom (by
         have := congrArg (fun H => H.obj (Z.dom i))
           (Dila_factor_unique_on_C Z F G₁ G₂ h₁ h₂)
-        exact this.symm) := by
-  sorry
+        exact this.symm) :=  by
+  intro i X n hn
+
+  let b :=
+    fraction_in_dila_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩
+
+  have hb :
+      b ≫ (CatToDila Z).map (Z.mor i) =
+        (CatToDila Z).map n := by
+    apply Quotient.sound
+    change
+      (GeneratedToLocalization Z).map
+          (Quiver.Hom.toPath
+            (fraction_in_generated Z
+              ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)) ≫
+        (GeneratedToLocalization Z).map
+          (Quiver.Hom.toPath
+            ((CToGeneratorQuiver Z).map (Z.mor i)))
+      =
+      (GeneratedToLocalization Z).map
+          (Quiver.Hom.toPath
+            ((CToGeneratorQuiver Z).map n))
+
+    rw [← Functor.map_comp]
+
+    change
+      fraction_in_loc_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩ ≫
+          (CenterMorphismProperty Z).Q.map (Z.mor i)
+        =
+      (CenterMorphismProperty Z).Q.map n
+
+    exact fraction_comp_mor Z i X n hn
+
+  have h₁b :
+      G₁.map b ≫
+          G₁.map ((CatToDila Z).map (Z.mor i))
+        =
+      G₁.map ((CatToDila Z).map n) := by
+    rw [← Functor.map_comp]
+    rw [hb]
+
+  have h₂b :
+      G₂.map b ≫
+          G₂.map ((CatToDila Z).map (Z.mor i))
+        =
+      G₂.map ((CatToDila Z).map n) := by
+    rw [← Functor.map_comp]
+    rw [hb]
+
+  have hmono :
+      Mono (F.map (Z.mor i)) := by
+    constructor
+    intro W u v huv
+
+    apply hfaith.map_injective
+
+    haveI :
+        IsIso ((ImageCenterLocalizationFunctor Z F).map
+          (F.map (Z.mor i))) := by
+      apply CategoryTheory.MorphismProperty.Q_inverts
+        (ImageCenterMorphismProperty Z F)
+      exact ⟨i, rfl⟩
+
+    apply (cancel_mono
+      ((ImageCenterLocalizationFunctor Z F).map
+        (F.map (Z.mor i)))).1
+
+    simpa only [Functor.map_comp] using
+      congrArg
+        (fun f =>
+          (ImageCenterLocalizationFunctor Z F).map f)
+        huv
+
+
+  have hcancel :
+      ∀ {u v :
+        G₁.obj ((CatToDila Z).obj X) ⟶
+          G₁.obj ((CatToDila Z).obj (Z.dom i))},
+      u ≫ G₁.map ((CatToDila Z).map (Z.mor i)) =
+        v ≫ G₁.map ((CatToDila Z).map (Z.mor i)) →
+      u = v := by
+
+    intro u v huv
+
+    haveI :
+        Mono ((CatToDila Z ⋙ G₁).map (Z.mor i)) := by
+      rw [h₁]
+      exact hmono
+
+    haveI :
+        Mono (G₁.map ((CatToDila Z).map (Z.mor i))) := by
+      change Mono ((CatToDila Z ⋙ G₁).map (Z.mor i))
+      infer_instance
+
+    exact
+      (cancel_mono
+        (G₁.map ((CatToDila Z).map (Z.mor i)))).1 huv
+
+  apply hcancel
+
+
+  rw [h₁b]
+
+  have hn_map :
+      G₁.map ((CatToDila Z).map n) =
+        eqToHom
+          (congrArg (fun H => H.obj X)
+            (h₁.trans h₂.symm)) ≫
+        G₂.map ((CatToDila Z).map n) ≫
+        eqToHom
+          (congrArg (fun H => H.obj (Z.cod i))
+            (h₁.trans h₂.symm)).symm :=
+    map_eq_of_agree_on_C (Z := Z) (F := F)
+      G₁ G₂ h₁ h₂ n
+
+  rw [hn_map]
+
+  rw [← h₂b]
+
+  have hdi :
+    G₁.map ((CatToDila Z).map (Z.mor i)) =
+      eqToHom
+        (congrArg (fun H => H.obj (Z.dom i))
+          (h₁.trans h₂.symm)) ≫
+      G₂.map ((CatToDila Z).map (Z.mor i)) ≫
+      eqToHom
+        (congrArg (fun H => H.obj (Z.cod i))
+          (h₁.trans h₂.symm)).symm :=
+  map_eq_of_agree_on_C (Z := Z) (F := F)
+    G₁ G₂ h₁ h₂ (Z.mor i)
+
+  rw [hdi]
+  simp only [Category.assoc]
+  subst b
+  simp
 
 
 
