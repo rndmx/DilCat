@@ -230,6 +230,8 @@ def CToGeneratorQuiver :
     ⟨(CenterMorphismProperty Z).Q.map f,
       Or.inr ⟨X, Y, f, rfl⟩⟩
 
+
+
 def CatToDila :
     C ⥤ Dila Z where
   obj X :=
@@ -510,6 +512,10 @@ lemma exists_unique_factor_D
     rw [hq', hq])
 
 
+
+
+
+
 theorem exists_Dila_factor
     (hfaith :
       (ImageCenterLocalizationFunctor Z F).Faithful)
@@ -522,42 +528,6 @@ theorem exists_Dila_factor
         Dila Z ⥤ D),
       CatToDila Z ⋙ G =
         F  := by
-  refine ⟨?G, ?_⟩
-
-
-
-  rcases p with ⟨i, X, m, hm⟩
-  let frac :
-    ∀ p : CenterSievePair Z,
-      F.obj p.2.1 ⟶ F.obj (Z.dom p.1) :=
-  fun p =>
-    match p with
-    | ⟨i, X, ⟨m, hm⟩⟩ =>
-        Classical.choose
-          (exists_unique_factor_D Z F hfaith hsieve
-            i
-            (F.obj X)
-            (F.map m)
-            (by
-              refine ⟨X, m, hm, ?_⟩
-              rfl))
-
-  have frac_spec :
-      ∀ p : CenterSievePair Z,
-        frac p ≫ F.map (Z.mor p.1) =
-          F.map p.2.2.1 := by
-    intro p
-    exact Classical.choose_spec
-      (exists_unique_factor_D Z F hfaith hsieve
-        p.1 p.2.1 p.2.2.1 p.2.2.2)
-
-
-
-
-
-
-
-
     sorry
 
 
