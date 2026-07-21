@@ -519,51 +519,46 @@ theorem exists_Dila_factor
           Sieve.generate
             (Presieve.singleton (F.map (Z.mor i)))) :
     ∃ (G :
-        Dila Z ⥤ ImageCenterLocalization Z F),
+        Dila Z ⥤ D),
       CatToDila Z ⋙ G =
-        F ⋙ ImageCenterLocalizationFunctor Z F := by
-
-    have hInv :
-      (CenterMorphismProperty Z).IsInvertedBy
-        (F ⋙ ImageCenterLocalizationFunctor Z F) := by
-      intro X Y f hf
-      rcases hf with ⟨i, h⟩
-      cases h
-
-      change IsIso
-        ((ImageCenterLocalizationFunctor Z F).map
-          (F.map (Z.mor i)))
-
-      haveI :
-          IsIso ((ImageCenterLocalizationFunctor Z F).map
-            (F.map (Z.mor i))) := by
-        apply CategoryTheory.MorphismProperty.Q_inverts
-          (ImageCenterMorphismProperty Z F)
-        exact ⟨i, rfl⟩
-
-      infer_instance
+        F  := by
+  refine ⟨?G, ?_⟩
 
 
 
+  rcases p with ⟨i, X, m, hm⟩
+  let frac :
+    ∀ p : CenterSievePair Z,
+      F.obj p.2.1 ⟶ F.obj (Z.dom p.1) :=
+  fun p =>
+    match p with
+    | ⟨i, X, ⟨m, hm⟩⟩ =>
+        Classical.choose
+          (exists_unique_factor_D Z F hfaith hsieve
+            i
+            (F.obj X)
+            (F.map m)
+            (by
+              refine ⟨X, m, hm, ?_⟩
+              rfl))
 
-    let L :
-        (CenterMorphismProperty Z).Localization ⥤
-          ImageCenterLocalization Z F :=
-      Localization.Construction.lift
-        (F ⋙ ImageCenterLocalizationFunctor Z F)
-        hInv
-
-    refine ⟨DilaToLoc Z ⋙ L, ?_⟩
-
-    change (CatToDila Z ⋙ DilaToLoc Z) ⋙ L =
-      F ⋙ ImageCenterLocalizationFunctor Z F
+  have frac_spec :
+      ∀ p : CenterSievePair Z,
+        frac p ≫ F.map (Z.mor p.1) =
+          F.map p.2.2.1 := by
+    intro p
+    exact Classical.choose_spec
+      (exists_unique_factor_D Z F hfaith hsieve
+        p.1 p.2.1 p.2.2.1 p.2.2.2)
 
 
-    rw [CatToDila_comp_DilaToLoc Z]
-
-    exact Localization.Construction.fac _ _
 
 
+
+
+
+
+    sorry
 
 
 lemma Dila_factor_unique_on_C
@@ -952,11 +947,12 @@ theorem Dila_factor_unique
     (h₁ :
       CatToDila Z ⋙ G₁ =
         F)
-    (hfaith :
-    (ImageCenterLocalizationFunctor Z F).Faithful)
     (h₂ :
       CatToDila Z ⋙ G₂ =
-        F) :
+        F)
+    (hfaith :
+       (ImageCenterLocalizationFunctor Z F).Faithful)
+     :
     G₁ = G₂ := by
   have h_obj :
       ∀ X : Dila Z, G₁.obj X = G₂.obj X := by
@@ -1000,6 +996,46 @@ theorem Dila_factor_unique
         exact Dila_factor_unique_fraction
           Z F G₁ G₂ (by assumption) h₁ h₂ i X n hn)
         f
+
+
+
+
+
+
+theorem Dila_universal_property
+    (F : C ⥤ D)
+    (hfaith :
+       (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i)))) :
+    ∃! (G : Dila Z ⥤ ImageCenterLocalization Z F),
+      CatToDila Z ⋙ G =
+        F ⋙ ImageCenterLocalizationFunctor Z F := by
+
+
+  obtain ⟨G, hG⟩ :=
+    exists_Dila_factor Z F hfaith hsieve
+
+  refine ⟨G, hG, ?_⟩
+
+  intro G' hG'
+
+  exact Dila_factor_unique
+    Z
+    F
+    G
+    G'
+    (by sorry)
+    (by sorry)
+    hfaith
+
+
+
+
+
 
 
 end CategoryTheory
