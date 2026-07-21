@@ -511,8 +511,27 @@ lemma exists_unique_factor_D
   exact unique_factor_D Z F hfaith i Y q' q (by
     rw [hq', hq])
 
+def uniqueFactor_D
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i))))
+    (i : Z.I) (Y : C)
+    (n : Y ⟶ Z.cod i)
+    (hn : Z.N i n) :
+    F.obj Y ⟶ F.obj (Z.dom i) := by
 
+  have hn' :
+      (Sieve.functorPushforward F (Z.N i)).arrows (F.map n) := by
+    refine ⟨Y, n, 𝟙 _, hn, ?_⟩
+    simp
 
+  exact Classical.choose
+    (exists_unique_factor_D Z F hfaith hsieve
+      i (F.obj Y) (F.map n) hn')
 
 
 
@@ -524,13 +543,70 @@ theorem exists_Dila_factor
         Sieve.functorPushforward F (Z.N i) ≤
           Sieve.generate
             (Presieve.singleton (F.map (Z.mor i)))) :
-    ∃ (G :
-        Dila Z ⥤ D),
-      CatToDila Z ⋙ G =
-        F  := by
+    ∃ (G : Dila Z ⥤ D),
+      CatToDila Z ⋙ G = F := by
+
+  let Gq : GeneratorObjects Z ⥤q D :=
+    {
+      obj := fun X => sorry
+
+      map := by
+        intro X Y g
+
+        rcases g.property with hfrac | horig
+
+        · -- fraction generator
+          rcases hfrac with ⟨p, rfl⟩
+
+          -- p : CenterSievePair Z
+          -- p = ⟨i, ⟨Y, ⟨n,hn⟩⟩⟩
+
+          exact
+            uniqueFactor_D Z F hfaith hsieve
+              p.1 p.2.1 p.2.2.1 p.2.2.2
+
+        · -- original generator
+          rcases horig with ⟨X, Y, f, rfl⟩
+
+          exact F.map f
+    }
+
+
+  let H : GeneratedCategory Z ⥤ D :=
+    Paths.lift Gq
+
+
+  have hrel :
+      ∀ {X Y : GeneratedCategory Z}
+        (f g : X ⟶ Y),
+        DilaRel Z f g →
+        H.map f = H.map g := by
+
+    intro X Y f g hfg
+
+    apply hfaith.map_injective
+
     sorry
 
 
+  let G : Dila Z ⥤ D :=
+    CategoryTheory.Quotient.lift
+      (DilaRel Z)
+      H
+      sorry
+
+
+  refine ⟨G, ?_⟩
+
+
+  apply Functor.ext
+
+  · sorry
+
+  ·
+    sorry
+
+   
 lemma Dila_factor_unique_on_C
     (G₁ G₂ : Dila Z ⥤ D)
     (h₁ : CatToDila Z ⋙ G₁ = F)
