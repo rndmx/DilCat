@@ -887,10 +887,36 @@ lemma Generated_factor_unique_map
         rw [hg]
         exact h_fraction i X n hn
 
-      ·  
+      · rcases h with ⟨X, Y, g₁, hp⟩
+
+        have hA :
+            A = objEquiv (CenterMorphismProperty Z) X := by
+          exact congrArg Sigma.fst hp
+
+        have hB :
+            B = objEquiv (CenterMorphismProperty Z) Y := by
+          exact congrArg (fun s => s.2.1) hp
+
+        subst A
+        subst B
+
+        dsimp [P]
+
+        have hg :
+            g =
+              ⟨
+                (CenterMorphismProperty Z).Q.map g₁,
+                Or.inr ⟨X, Y, g₁, rfl⟩
+              ⟩ := by
+
+               apply GeneratorQuiver.ext_val Z
+               simpa [Prod.ext_iff] using hp
+
+        rw [hg]
+
+        exact h_mor g₁
 
 
-        sorry
 
 
 
