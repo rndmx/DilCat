@@ -801,6 +801,14 @@ lemma Generated_factor_unique_map
       eqToHom (h_obj X) ≫
         G₂.map f ≫
         eqToHom (h_obj Y).symm := by
+
+
+
+
+
+
+
+
   letI : (GeneratedToDila Z).Full := GeneratedToDila_full Z
 
 
@@ -851,6 +859,7 @@ lemma Generated_factor_unique_map
         dsimp [P]
 
 
+
         have hg :
             g =
               ⟨
@@ -858,41 +867,17 @@ lemma Generated_factor_unique_map
                   (fraction_in_path_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩),
                 Or.inl ⟨⟨i, ⟨X, ⟨n, hn⟩⟩⟩, rfl⟩
               ⟩ := by
-                      let a : Σ X Y : (CenterMorphismProperty Z).Localization, X ⟶ Y :=
-                        ⟨objEquiv (CenterMorphismProperty Z) X,
-                          objEquiv (CenterMorphismProperty Z) (Z.dom i),
-                          g.val⟩
+          apply GeneratorQuiver.ext_val Z
+          have hval :
+              g.val =
+                (Quotient.functor (relations (CenterMorphismProperty Z))).map
+                  (fraction_in_path_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩) := by
 
-                      let b : Σ X Y : (CenterMorphismProperty Z).Localization, X ⟶ Y :=
-                        ⟨objEquiv (CenterMorphismProperty Z) X,
-                          objEquiv (CenterMorphismProperty Z) (Z.dom i),
-                          (Quotient.functor (relations (CenterMorphismProperty Z))).map
-                            (fraction_in_path_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩)⟩
-
-                      have hab : a = b := by
-                              simpa [a, b] using hp
-
-                      have hval :
-                          g.val =
-                            (Quotient.functor (relations (CenterMorphismProperty Z))).map
-                              (fraction_in_path_single Z ⟨i, ⟨X, ⟨n, hn⟩⟩⟩) := by
-                                sorry
+                  simpa [Prod.ext_iff] using hp
 
 
 
-
-
-
-
-
-
-
-                      exact GeneratorQuiver.ext_val Z hval
-
-
-
-
-
+          exact hval
 
 
 
@@ -902,7 +887,12 @@ lemma Generated_factor_unique_map
         rw [hg]
         exact h_fraction i X n hn
 
-      · sorry
+      ·  
+
+
+        sorry
+
+
 
   exact hgP
 
