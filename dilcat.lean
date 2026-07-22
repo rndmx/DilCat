@@ -641,7 +641,7 @@ def localizationMap :
 theorem localizationMap_comp_Q :
     (CenterMorphismProperty Z).Q ⋙ localizationMap Z F =
       F ⋙ ImageCenterLocalizationFunctor Z F := by
-  sorry
+  apply Localization.Construction.fac
 
 
 def Gq
@@ -673,6 +673,21 @@ def H
     GeneratedCategory Z ⥤ D :=
   Paths.lift (Gq Z F hfaith hsieve)
 
+lemma mapGenerator_original
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i))))
+    {X Y : C} (f : X ⟶ Y) :
+    mapGenerator Z F hfaith hsieve
+      ⟨(CenterMorphismProperty Z).Q.map f,
+        Or.inr ⟨X, Y, f, rfl⟩⟩ =
+      F.map f := by
+
+      sorry
 
 
 lemma H_map_original
@@ -686,7 +701,15 @@ lemma H_map_original
     (H Z F hfaith hsieve).map
       ((CToGeneratorQuiver Z).map f).toPath =
       F.map f := by
-  sorry
+      dsimp [H, Paths.lift]
+      rw [show ((CToGeneratorQuiver Z).map f).toPath =
+          Quiver.Path.nil.cons ((CToGeneratorQuiver Z).map f) by rfl]
+      simp
+      exact mapGenerator_original Z F hfaith hsieve f
+
+
+
+
 
 
 
