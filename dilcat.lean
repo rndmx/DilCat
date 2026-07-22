@@ -105,6 +105,7 @@ def IsOriginalMor
        objEquiv (CenterMorphismProperty Z) Y,
        (CenterMorphismProperty Z).Q.map g⟩
 
+
 def FractionOrOriginalMorphismProperty :
     MorphismProperty (CenterMorphismProperty Z).Localization :=
   fun {X Y} f =>
@@ -135,6 +136,37 @@ def forgetGenerator : GeneratorObjects Z ⥤q (CenterMorphismProperty Z).Localiz
 def GeneratedToLocalization :
     GeneratedCategory Z ⥤ (CenterMorphismProperty Z).Localization :=
          CategoryTheory.Paths.lift (forgetGenerator Z)
+
+
+
+
+
+
+noncomputable def originalFactor
+    {X Y : GeneratorObjects Z}
+    (g : X ⟶ Y)
+    (h : IsOriginalMor Z ⟨X,Y,g.1⟩) :
+    (objEquiv (CenterMorphismProperty Z)).symm X ⟶
+      (objEquiv (CenterMorphismProperty Z)).symm Y :=
+by
+  classical
+  let X₀ := Classical.choose h
+  let h₁ := Classical.choose_spec h
+  let Y₀ := Classical.choose h₁
+  let h₂ := Classical.choose_spec h₁
+  have hf := Classical.choose_spec h₂
+  have hX :
+      X = objEquiv (CenterMorphismProperty Z) X₀ :=
+    congrArg Sigma.fst hf
+
+  have hY :
+      Y = objEquiv (CenterMorphismProperty Z) Y₀ :=
+    congrArg (fun s => s.2.1) hf
+
+  rw [hX, hY]
+  simp
+  change X₀ ⟶ Y₀
+  exact Classical.choose h₂
 
 def DilaRel :
     HomRel (GeneratedCategory Z) :=
@@ -533,6 +565,121 @@ def uniqueFactor_D
     (exists_unique_factor_D Z F hfaith hsieve
       i (F.obj Y) (F.map n) hn')
 
+def mapGenerator
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i))))
+    {X Y : GeneratorObjects Z}
+    (g : (GeneratorQuiver Z).Hom X Y) :
+    F.obj ((objEquiv (CenterMorphismProperty Z)).symm X) ⟶
+    F.obj ((objEquiv (CenterMorphismProperty Z)).symm Y) := by
+
+  classical
+
+  by_cases h : FractionMorphismProperty Z g.1
+
+  · let p := Classical.choose h
+    let hp := Classical.choose_spec h
+
+    have hX :
+    X = objEquiv (CenterMorphismProperty Z) p.snd.fst := by
+        dsimp [p] at hp
+        exact congrArg Sigma.fst hp
+
+    have hY :
+    Y = objEquiv (CenterMorphismProperty Z) (Z.dom p.fst) := by
+        dsimp [p] at hp
+        exact congrArg (fun s => s.2.1) hp
+
+    rw [hX, hY]
+
+    exact
+      uniqueFactor_D Z F hfaith hsieve
+        p.1 p.2.1 p.2.2.1 p.2.2.2
+
+  · have horig : IsOriginalMor Z ⟨X, ⟨Y, g.1⟩⟩ :=
+      g.property.resolve_left h
+
+    exact F.map (originalFactor Z g horig)
+
+
+
+
+def localizationMap :
+    (CenterMorphismProperty Z).Localization ⥤
+      ImageCenterLocalization Z F := by
+  sorry
+
+theorem localizationMap_comp_Q :
+    (CenterMorphismProperty Z).Q ⋙ localizationMap Z F =
+      F ⋙ ImageCenterLocalizationFunctor Z F := by
+  sorry
+
+
+def Gq
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i)))) :
+    GeneratorObjects Z ⥤q D :=
+{
+  obj := fun X =>
+    F.obj ((objEquiv (CenterMorphismProperty Z)).symm X)
+
+  map := by
+    intro X Y g
+    exact mapGenerator Z F hfaith hsieve g
+}
+
+def H
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i)))) :
+    GeneratedCategory Z ⥤ D :=
+  Paths.lift (Gq Z F hfaith hsieve)
+
+
+
+lemma H_map_original
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate (Presieve.singleton (F.map (Z.mor i))))
+    {X Y : C} (f : X ⟶ Y) :
+    (H Z F hfaith hsieve).map
+      ((CToGeneratorQuiver Z).map f).toPath =
+      F.map f := by
+  rfl
+
+
+
+lemma  generatedLocalization_commutes
+    (hfaith :
+      (ImageCenterLocalizationFunctor Z F).Faithful)
+    (hsieve :
+      ∀ (i : Z.I),
+        Sieve.functorPushforward F (Z.N i) ≤
+          Sieve.generate
+            (Presieve.singleton (F.map (Z.mor i)))) :
+    H Z F hfaith hsieve ⋙ ImageCenterLocalizationFunctor Z F =
+      GeneratedToLocalization Z ⋙ localizationMap Z F := by
+  sorry
+
+
+
 
 
 theorem exists_Dila_factor
@@ -546,68 +693,68 @@ theorem exists_Dila_factor
     ∃ (G : Dila Z ⥤ D),
       CatToDila Z ⋙ G = F := by
 
-  let Gq : GeneratorObjects Z ⥤q D :=
-    {
-      obj := fun X => F.obj ((objEquiv (CenterMorphismProperty Z)).symm X)
-
-      map := by
-          classical
-          intro X Y g
-
-          by_cases hfrac : FractionMorphismProperty Z g.1
-
-          · rcases hfrac with ⟨p, hp⟩
-            subst g
-
-            exact
-              uniqueFactor_D Z F hfaith hsieve
-                p.1 p.2.1 p.2.2.1 p.2.2.2
-
-          · have horig :
-              IsOriginalMor Z ⟨X, Y, g.1⟩ :=
-            g.property.resolve_left hfrac
-
-            rcases horig with ⟨X₀, Y₀, f, hf⟩
-
-            subst hf
-
-            exact F.map f
-    }
 
 
-  let H : GeneratedCategory Z ⥤ D :=
-    Paths.lift Gq
-
-
-  have hrel :
+      have hrel :
       ∀ {X Y : GeneratedCategory Z}
         (f g : X ⟶ Y),
         DilaRel Z f g →
-        H.map f = H.map g := by
+        (H Z F hfaith hsieve).map f =
+        (H Z F hfaith hsieve).map g := by
+        intro X Y f g hfg
 
-    intro X Y f g hfg
+        apply (ImageCenterLocalizationFunctor Z F).map_injective
 
-    apply hfaith.map_injective
+        have hcomm :=
+          generatedLocalization_commutes Z F hfaith hsieve
 
-    sorry
-
-
-  let G : Dila Z ⥤ D :=
-    CategoryTheory.Quotient.lift
-      (DilaRel Z)
-      H
-      sorry
+        change
+          (H Z F hfaith hsieve ⋙ ImageCenterLocalizationFunctor Z F).map f =
+          (H Z F hfaith hsieve ⋙ ImageCenterLocalizationFunctor Z F).map g
 
 
-  refine ⟨G, ?_⟩
+
+        rw [hcomm]
+
+        simpa only [Functor.comp_map] using
+          congrArg
+            (fun k => (localizationMap Z F).map k)
+            hfg
+
+      let G : Dila Z ⥤ D :=
+          CategoryTheory.Quotient.lift
+            (DilaRel Z)
+            (H Z F hfaith hsieve)
+            (by
+              intro X Y f g hfg
+              exact hrel f g hfg)
 
 
-  apply Functor.ext
 
-  · sorry
+      refine ⟨G, ?_⟩
 
-  ·
-    sorry
+
+      apply Functor.ext
+
+      · intro X Y f
+
+        simp only [Functor.comp_map]
+
+        simp [CatToDila, G]
+
+        change
+          (H Z F hfaith hsieve).map
+              ((CToGeneratorQuiver Z).map f).toPath =
+            F.map f
+
+        exact H_map_original Z F hfaith hsieve f
+
+
+      · intro X
+        simp [CatToDila, G, H, Gq]
+        rfl
+
+
 
 
 lemma Dila_factor_unique_on_C
