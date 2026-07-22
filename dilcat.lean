@@ -606,13 +606,37 @@ def mapGenerator
 
     exact F.map (originalFactor Z g horig)
 
-
-
-
 def localizationMap :
     (CenterMorphismProperty Z).Localization ⥤
       ImageCenterLocalization Z F := by
-  sorry
+
+  apply Localization.Construction.lift
+    (W := CenterMorphismProperty Z)
+    (F ⋙ ImageCenterLocalizationFunctor Z F)
+
+  intro X Y f hf
+
+  rcases hf with ⟨i, hi⟩
+
+  have hX : X = Z.dom i := by
+    exact congrArg Sigma.fst hi
+
+  have hY : Y = Z.cod i := by
+    exact congrArg (fun s => s.2.1) hi
+
+  subst X
+  subst Y
+
+
+  apply CategoryTheory.MorphismProperty.Q_inverts
+  refine ⟨i, ?_⟩
+  simp
+  cases hi
+  rfl
+
+
+
+
 
 theorem localizationMap_comp_Q :
     (CenterMorphismProperty Z).Q ⋙ localizationMap Z F =
