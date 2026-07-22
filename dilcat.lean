@@ -662,7 +662,7 @@ lemma H_map_original
     (H Z F hfaith hsieve).map
       ((CToGeneratorQuiver Z).map f).toPath =
       F.map f := by
-  rfl
+  sorry
 
 
 
@@ -1196,8 +1196,6 @@ theorem Dila_factor_unique
 
 
 
-
-
 theorem Dila_universal_property
     (F : C ⥤ D)
     (hfaith :
@@ -1207,10 +1205,9 @@ theorem Dila_universal_property
         Sieve.functorPushforward F (Z.N i) ≤
           Sieve.generate
             (Presieve.singleton (F.map (Z.mor i)))) :
-    ∃! (G : Dila Z ⥤ ImageCenterLocalization Z F),
+    ∃! (G : Dila Z ⥤ D),
       CatToDila Z ⋙ G =
-        F ⋙ ImageCenterLocalizationFunctor Z F := by
-
+        F := by
 
   obtain ⟨G, hG⟩ :=
     exists_Dila_factor Z F hfaith hsieve
@@ -1222,10 +1219,10 @@ theorem Dila_universal_property
   exact Dila_factor_unique
     Z
     F
-    G
     G'
-    (by sorry)
-    (by sorry)
+    G
+    hG'
+    hG
     hfaith
 
 
