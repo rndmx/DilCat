@@ -11,7 +11,9 @@
 \usepackage{newunicodechar}
 \usepackage{enumitem}
 \usepackage{xcolor}
-\usepackage[colorlinks,linkcolor={violet!80!black},citecolor=black,urlcolor={cyan!30!blue}]{hyperref}
+\definecolor{linkblue}{RGB}{0,82,204}
+\colorlet{linkred}{red!90!blue}
+\usepackage[colorlinks,linkcolor=linkred,citecolor=black,urlcolor=linkblue]{hyperref}
 \newcommand{\lc}[1]{\url{#1}}
 \newcommand{\lcode}{\begingroup\catcode`\_=12\relax\lcodeInner}
 \newcommand{\lcodeInner}[1]{\texttt{#1}\endgroup}
