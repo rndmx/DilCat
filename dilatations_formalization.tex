@@ -1,0 +1,1988 @@
+\documentclass[11pt]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{tikz}
+\usetikzlibrary{matrix,arrows,decorations.markings}
+\usepackage{tikz-cd}
+\usepackage{bbm}
+\usepackage{array,longtable,booktabs}
+\usepackage[numbers,square]{natbib}
+\usepackage{url}
+\usepackage{newunicodechar}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks,linkcolor={violet!80!black},citecolor=black,urlcolor={cyan!30!blue}]{hyperref}
+\newcommand{\lc}[1]{\url{#1}}
+\newcommand{\lcode}{\begingroup\catcode`\_=12\relax\lcodeInner}
+\newcommand{\lcodeInner}[1]{\texttt{#1}\endgroup}
+\newunicodechar{¬}{\ensuremath{\lnot}}
+\newunicodechar{Σ}{\ensuremath{\Sigma}}
+\newunicodechar{Φ}{\ensuremath{\Phi}}
+\newunicodechar{Θ}{\ensuremath{\Theta}}
+\newunicodechar{Ω}{\ensuremath{\Omega}}
+\newunicodechar{ᵒ}{\textsuperscript{o}}
+\newunicodechar{ᵖ}{\textsuperscript{p}}
+\newunicodechar{ℤ}{\ensuremath{\mathbb{Z}}}
+\newunicodechar{ℕ}{\ensuremath{\mathbb{N}}}
+\newunicodechar{→}{\ensuremath{\to}}
+\newunicodechar{↔}{\ensuremath{\leftrightarrow}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{∃}{\ensuremath{\exists}}
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∉}{\ensuremath{\notin}}
+\newunicodechar{∧}{\ensuremath{\wedge}}
+\newunicodechar{∨}{\ensuremath{\vee}}
+\newunicodechar{≃}{\ensuremath{\simeq}}
+\newunicodechar{≅}{\ensuremath{\cong}}
+\newunicodechar{≌}{\ensuremath{\backsimeq}}
+\newunicodechar{≠}{\ensuremath{\neq}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≫}{\ensuremath{\gg}}
+\newunicodechar{≪}{\ensuremath{\ll}}
+\newunicodechar{⊂}{\ensuremath{\subset}}
+\newunicodechar{⊆}{\ensuremath{\subseteq}}
+\newunicodechar{⊔}{\ensuremath{\sqcup}}
+\newunicodechar{⊤}{\ensuremath{\top}}
+\newunicodechar{⊥}{\ensuremath{\bot}}
+\newunicodechar{⋙}{\ensuremath{\ggg}}
+\newunicodechar{⟨}{\ensuremath{\langle}}
+\newunicodechar{⟩}{\ensuremath{\rangle}}
+\newunicodechar{⟦}{\ensuremath{\llbracket}}
+\newunicodechar{⟧}{\ensuremath{\rrbracket}}
+\newunicodechar{⟶}{\ensuremath{\longrightarrow}}
+\newunicodechar{⥤}{\ensuremath{\Rightarrow}}
+\newunicodechar{𝟙}{\ensuremath{\mathbbm{1}}}
+\newunicodechar{ι}{\ensuremath{\iota}}
+\newunicodechar{ᵢ}{\ensuremath{_i}}
+\newunicodechar{₀}{\ensuremath{_0}}
+\newunicodechar{₁}{\ensuremath{_1}}
+\newunicodechar{₂}{\ensuremath{_2}}
+\newunicodechar{₃}{\ensuremath{_3}}
+\newunicodechar{₄}{\ensuremath{_4}}
+\newunicodechar{α}{\ensuremath{\alpha}}
+\newunicodechar{β}{\ensuremath{\beta}}
+\newunicodechar{γ}{\ensuremath{\gamma}}
+\newunicodechar{ν}{\ensuremath{\nu}}
+\newunicodechar{ψ}{\ensuremath{\psi}}
+\newunicodechar{⦃}{\{\{}
+\newunicodechar{⦄}{\}\}}
+\newunicodechar{⊕}{\ensuremath{\oplus}}
+\newunicodechar{𝟭}{\ensuremath{\mathbbm{1}}}
+
+% Displayed multi-line Lean code blocks: locally give the underscore
+% its ordinary (catcode 12) meaning and switch to obeylines/ttfamily,
+% so a block can be typed with raw underscores and line breaks exactly
+% as in the .lean source; the \newunicodechar declarations above remain
+% active characters throughout, so unicode Lean notation inside a block
+% renders exactly as it does in \lc/\lcode.
+% Each source line inside a leancode block must end with `\\' explicitly
+% (matching the line breaks already present in the .lean source); this
+% lets ordinary paragraph line-breaking wrap a line that is still too
+% long, instead of the silent overflow that plain \obeylines produces.
+\newenvironment{leancode}{%
+  \begingroup
+  \catcode`\_=12\relax
+  \catcode`\^=12\relax
+  \small\ttfamily\raggedright\baselineskip=1.15\baselineskip
+  \par\smallskip\noindent
+}{%
+  \par\smallskip
+  \endgroup
+}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem*{designchoice}{Design choice}
+
+\newcommand{\calC}{\mathcal C}
+\newcommand{\calD}{\mathcal D}
+\newcommand{\calE}{\mathcal E}
+\newcommand{\calG}{\mathcal G}
+\newcommand{\op}{\ensuremath{\mathrm{op}}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\dom}{\mathrm{dom}}
+\newcommand{\cod}{\mathrm{cod}}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\Ob}{Ob}
+\DeclareMathOperator{\Mor}{Mor}
+
+\title[Dilatations of categories, via their Lean formalization]{Dilatations of categories,\\ via their Lean formalization}
+\author{Arnaud Mayeux}
+\address{University of Wisconsin--Madison, Madison, WI, USA}
+\email{mayeux@wisc.edu}
+\thanks{The Lean~4 source is available at \url{https://github.com/rndmx/DilCat}.}
+\keywords{Dilatations of categories, localization of categories, Lean 4, formalized
+mathematics, formalized mathematical data, automated deduction}
+\date{\today}
+
+\begin{document}
+\tolerance=2500
+\emergencystretch=3em
+\hbadness=4000
+\maketitle
+
+\begin{abstract}
+Given a category $\calC$ and a center, that is a collection of pairs $(d_i, N_i)$
+consisting of a morphism $d_i$ and a sieve $N_i$ over its codomain, the dilatation of
+$\calC$ is a new category $\calC'$ in which every $n \in N_i$ factors, uniquely and
+functorially, through $d_i$. This construction refines the classical localization of
+categories. This paper presents the theory of dilatations of categories through a full
+formalization of the construction and its main theorems in the Lean~4 proof assistant, on
+top of the Mathlib library. In particular, we formalize the universal property of
+dilatations, the operations of restricting, shrinking, and combining centers, the dual
+theory of codilatations, and the comparison with dilatations of commutative rings. The
+formalization also produced minor clarifications and corrections to the published theory,
+recorded in an erratum. An appendix collects a systematic dictionary between the
+mathematical statements and the Lean declarations that formalize them.
+\end{abstract}
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+\section{Introduction}
+\label{sec:intro}
+
+In \citep{MayDil} we introduced the benchmark problem of formalizing all indexed
+mathematics as a machine-verifiable, continuously updated corpus of mathematical
+knowledge, and argued that any artificial system claiming general reasoning must be able
+to sustain it; the theory of dilatations of categories was proposed there as a test
+example. The present paper carries out that example in full: we formalize a complete
+published mathematical paper and document the formalization entirely, including the
+clarifications and corrections that the process produced, as anticipated in
+\citep[\S 5.6]{MayDil}. In this sense, this paper is food for AI: one machine-checked, fully documented
+unit of the corpus on which AI-powered mathematical reasoning can be trained, evaluated,
+and built. Large language models are trained on data, and the present paper is itself
+data of a scarce kind: it pairs informal mathematics with its formal counterpart,
+statement by statement, and carries its own mechanical verifier. From this perspective,
+the production of such data constitutes a concrete contribution to the development of
+general artificial reasoning systems.
+
+Category theory has become one of Mathlib's largest and most actively developed libraries,
+and constructions once confined to informal exposition now have precise, checkable counterparts a proof
+assistant can verify line by line. This paper presents the mathematics of dilatations of
+categories from their Lean formalization.
+
+
+
+\subsection{Dilatations, informally}
+
+Let $A$ be a commutative ring and $S \subset A$ a subset. The localization $S^{-1}A$ is
+obtained by formally adjoining an inverse to every element of $S$. Localization is a
+pervasive operation, and its categorical analogue is equally pervasive: given a category
+$\calC$ and a collection $\Sigma$ of morphisms of $\calC$, the localization $\calC[\Sigma^{-1}]$
+is the category obtained by formally adjoining an inverse to every morphism in $\Sigma$,
+universal among functors out of $\calC$ that invert $\Sigma$.
+
+Dilatations of rings are a different, more refined operation. Instead of inverting an
+element $a \in A$ outright, one prescribes a pair $(M,a)$ with $M$ an ideal and $a$ an
+element of $A$, and forms a ring in which every element of $M$ becomes divisible by $a$,
+but only those elements, and only by $a$. Dilatations of rings are
+the local building blocks of dilatations of schemes (Néron blowups and their
+relatives)~\citep{M,MRR,DMS}, and they specialize to localization when $M$ is taken to be the
+whole ring.
+
+The starting observation of the theory developed here is that both constructions are
+instances of a single categorical construction. Fix a category $\calC$. A center in
+$\calC$ is a family $\{(d_i, N_i)\}_{i \in I}$ where each $d_i$ is a morphism of $\calC$ and
+each $N_i$ is a sieve over the codomain of $d_i$, i.e.\ a collection of morphisms
+into $\cod(d_i)$ closed under precomposition. The dilatation of $\calC$ with center
+$\{(d_i,N_i)\}_{i\in I}$ is a category $\calC'$, equipped with a functor
+$\Theta : \calC \to \calC'$ that is the identity on objects, such that for every $i \in I$
+and every $n \in N_i$ there is a unique morphism $b$ making the triangle
+\begin{equation}
+\label{eq:intro-triangle}
+\begin{tikzcd}
+\dom(n) \ar[rr, "\Theta(n)"] \ar[rd, dashed, "b"'] & & \cod(n) \\
+& \dom(d_i) \ar[ru, "\Theta(d_i)"'] &
+\end{tikzcd}
+\end{equation}
+commute in $\calC'$. Informally, $b$ is the ``fraction'' $d_i \backslash n = d_i^{-1}\circ n$:
+$\Theta(n)$ has been made to factor through $\Theta(d_i)$. Making this triangle
+condition into a genuine universal property, so that $\calC'$ is determined up to unique
+isomorphism and functorial in an appropriate sense, is the technical heart of the theory,
+and occupies Theorem~\ref{thm:universal-property} below.
+
+\subsection{This paper and its formalization}
+
+Every definition and every theorem in this text is accompanied by its Lean~4
+\citep{Lean4} formalization,
+carried out on top of the Mathlib library \citep{mathlib} and contained in a single file, which we refer to
+throughout as the formalization. Our governing principle is that the
+formalization is the primary source: where the original exposition of this material and
+the Lean development differ (in how a definition is formulated, in the order in which
+results are proved, in which auxiliary facts are extracted, or occasionally in the precise
+hypotheses of a theorem), we follow the formalization, and we explain the discrepancy when
+it is instructive. This is not merely a stylistic choice. Writing a mathematical argument in
+a form a proof assistant will accept forces every implicit step to be made explicit, and in
+two places this exposes a gap between what is asserted in the printed paper and what has
+actually been proved. Both gaps are minor. For \citep[Proposition~3.15]{Mayeux} (discussed
+in \S\ref{sec:gap} below), one step of the printed proof is not rigorous; the statement is
+formalized here under an additional hypothesis, and closing the gap unconditionally remains
+open. For \citep[Proposition~5.1]{Mayeux} (discussed in \S\ref{sec:rings-gap} below), the
+printed statement is factually wrong as stated --- the formalization exhibits an explicit
+counterexample --- but the defect is minor and easily fixed by reindexing the center
+(\S\ref{sec:rings-construction}), after which the intended identification holds.
+
+A systematic, tabulated correspondence between every mathematical statement of this paper and
+the Lean declaration(s) that formalize it is collected in Appendix~\ref{app:dictionary}, for
+readers who want to locate a specific statement in the source file quickly; the body of the
+paper is written to be read on its own; the dictionary is a reference, not a required
+companion.
+
+\subsection{Organization}
+\label{sec:organization}
+
+The formalization is organized, roughly, into: a reuse of Mathlib's existing machinery for
+the classical localization of a category (\S\ref{sec:localization}); the definition of a
+center and of the dilatation it generates, built as a quotient of a freely generated category
+rather than directly as a set of equivalence classes of ``fraction sequences''
+(\S\ref{sec:centers}--\S\ref{sec:dilatation-construction}); the basic properties of the
+canonical functor $\Theta : \calC \to \calC'$ (\S\ref{sec:theta-properties}); the universal
+property of the dilatation, which is the technical core of the theory
+(\S\ref{sec:universal-property}); three constructions that produce new dilatations from old
+ones, by restricting to a sub-family of the center (\S\ref{sec:restriction}), by shrinking
+each sieve to a sub-sieve while keeping the same family of morphisms (\S\ref{sec:subsieve}),
+or by combining two centers into one (\S\ref{sec:combining}); the dual notion of codilatation, obtained
+for free by passing to the opposite category (\S\ref{sec:codilatations}); and finally two
+worked examples, dilatations of commutative rings (\S\ref{sec:rings}) and an explicit
+finite counterexample showing that a natural strengthening of the theory, which does hold for
+rings, fails for categories (\S\ref{sec:counterexample}). We follow this order, which is the
+order of the formalization, rather than the order of the original paper on this subject,
+because each construction genuinely depends on the Lean infrastructure built in the sections
+that precede it.
+
+\subsection{Conventions}
+\label{sec:conventions}
+
+Composition is written in the mathematician's order: $g\circ f$ denotes ``$f$ then $g$''.
+Mathlib, and hence every Lean snippet in this paper, composes in the opposite, diagrammatic
+order: for \lcode{f : X ⟶ Y} and \lcode{g : Y ⟶ Z}, the Lean expression \lcode{f ≫ g} denotes
+the composite that we write $g \circ f$. We flag this translation once here and then use it
+silently throughout: a displayed equation $h = g\circ f$ always corresponds to a Lean
+equation \lcode{h = f ≫ g}.
+
+\section{The classical localization of a category, as reused from Mathlib}
+\label{sec:localization}
+
+\subsection{Sieves and the localization construction}
+
+Two pieces of classical category theory are needed:
+sieves, and the localization of a category at a collection of morphisms. Both are treated,
+in the formalization, as already available: Mathlib provides them, and the
+formalization does not reformalize either from scratch. Since a reader of this paper may not
+be a reader of Mathlib, we describe both constructions here, in the informal language of the
+original theory, and then explain precisely which pieces of Mathlib play which role.
+
+A sieve $N$ over an object $Y$ of $\calC$ is a collection of morphisms with codomain
+$Y$, closed under precomposition by an arbitrary morphism of $\calC$. Given a collection $E$
+of morphisms of $\calC$, the sieve $S_E$ generated by $E$ consists of all composites
+$e \circ n$ with $e \in E$ and $n$ an arbitrary morphism composable with $e$; when $E=\{d\}$
+is a single morphism we write $S_d$ for $S_{\{d\}}$. In Lean, \lcode{Sieve X} is a structure
+recording, for every object $Y$, a set of morphisms $Y \to X$ satisfying the closure
+condition, and \lc{Sieve.generate} builds $S_E$ from a \lc{Presieve} (an arbitrary, not
+necessarily closed, family of morphisms) representing $E$.
+
+Given a collection $\Sigma$ of morphisms of $\calC$, the localization $\calC[\Sigma^{-1}]$ is
+built classically (Gabriel--Zisman \citep{GZ}) as follows: form the directed graph $\mathcal G$ with one
+vertex per object of $\calC$, one edge $a$ for every morphism $a$ of $\calC$, and one
+formal inverse edge $\ell_d : \cod(d) \to \dom(d)$ for every $d \in \Sigma$; a
+$\Sigma$-sequence is a finite path in $\mathcal G$; two $\Sigma$-sequences are declared
+equivalent if one can be obtained from the other by composing two consecutive edges of
+$\calC$, by cancelling a consecutive $d,\ell_d$ or $\ell_d,d$ pair, or by deleting an
+identity edge; and $\calC[\Sigma^{-1}]$ is the category whose morphisms are equivalence
+classes of $\Sigma$-sequences. This is a completely general construction, needing nothing
+about $\calC$ beyond its being a category, and it satisfies the expected universal property:
+a functor $F : \calC \to \calD$ that inverts every $d \in \Sigma$ factors uniquely through
+the canonical functor $L : \calC \to \calC[\Sigma^{-1}]$.
+
+This is, verbatim, the construction implemented in Mathlib's
+\lc{CategoryTheory.Localization.Construction} file: the graph $\mathcal G$ is
+\lc{Localization.Construction.LocQuiver}, $\Sigma$-sequences are paths in this quiver
+(Mathlib's general-purpose \lc{Quiver.Path} type, via the free/path category
+\lc{CategoryTheory.Paths}), the equivalence relation of \citep[Definition~2.4]{Mayeux} is
+\lc{Localization.Construction.relations} (a congruence on paths in the sense of
+\S\ref{sec:dilatation-construction} below), and the localization itself is presented as
+\lc{(W).Localization} for \lc{W} a \lc{MorphismProperty} (Mathlib's name for a collection
+of morphisms closed under no particular condition, simply a predicate
+\lcode{∀ ⦃X Y⦄, (X ⟶ Y) → Prop}), together with a canonical functor \lc{W.Q} playing the
+role of $L$, and the universal property is
+\lc{Localization.Construction.lift}/\lc{fac}/\lc{uniq}.
+
+\begin{designchoice}
+Rather than reproduce Mathlib's localization construction adapted to $\Sigma$-sequences, the
+formalization builds the raw localization $\calC[\Sigma^{-1}]$ once and defines the dilatation
+as a further quotient mapping to it (\S\ref{sec:dilatation-construction}). This gives
+associativity of $\Sigma$-sequence composition, and every general Mathlib fact about
+localizations, for free.
+\end{designchoice}
+
+\section{Centers}
+\label{sec:centers}
+
+\subsection{The data of a center}
+
+\begin{definition}[Center]
+\label{def:center}
+A center in a category $\calC$ is a family $\{(d_i,N_i)\}_{i\in I}$, indexed by a
+nonempty type $I$, such that for every $i \in I$, $d_i$ is a morphism of $\calC$ and $N_i$
+is a sieve over $\cod(d_i)$.
+\end{definition}
+
+A center bundles exactly the data needed to state the factorization condition of
+\eqref{eq:intro-triangle}: an index set, and for each index a morphism together with a sieve
+over its codomain. In Lean this is a single structure:
+
+\begin{leancode}
+structure Center (C : Type u) [Category.{v} C] where \\
+  I : Type u \\
+  (nonempty : Nonempty I) \\
+  dom : I → C \\
+  cod : I → C \\
+  mor : ∀ i : I, dom i ⟶ cod i \\
+  N   : ∀ i : I, Sieve (C := C) (cod i) \\
+\end{leancode}
+
+\begin{designchoice}
+Two encoding choices are worth pointing out. First, \lc{dom} and \lc{cod} are recorded as
+separate functions $I \to \calC$ rather than being read off from \lcode{mor i}: this is purely
+for convenience of use (so that, e.g., \lcode{Z.dom i} can appear in a statement without
+first destructuring \lcode{Z.mor i}), and is definitionally redundant with \lc{mor}, whose type
+\lcode{dom i ⟶ cod i} already determines both. Second, the family is
+recorded as a structure with a function-valued field \lcode{I → ...} (a Mathlib-style
+indexed family) rather than, say, a \lc{Set} of triples $(X,Y,f)$ with a sieve
+attached to each: this is again the standard idiom for ``an $I$-indexed collection of
+data'' in Lean, and it is what makes the disjoint union of two centers
+(\S\ref{sec:combining}) a one-line definition, gluing two index types with
+\lc{Sum}.
+\end{designchoice}
+
+We write $Z$ for a center, and, following the paper this material is drawn from, write
+$\Sigma = \{d_i\}_{i\in I}$ for the underlying collection of morphisms (forgetting the
+sieves). Membership in $\Sigma$ is not recorded as a \lc{Set} in Lean; instead, being a
+central morphism is a property of an arbitrary triple $(X,Y,f)$:
+
+\begin{leancode}
+def IsCenterMor (f : Σ X Y : C, X ⟶ Y) : Prop := \\
+  ∃ i : Z.I, f = ⟨Z.dom i, Z.cod i, Z.mor i⟩ \\[0.5\baselineskip]
+def CenterMorphismProperty : MorphismProperty C := \\
+  fun X Y f => IsCenterMor Z ⟨X, Y, f⟩ \\
+\end{leancode}
+
+Here \lcode{Σ X Y : C, X ⟶ Y} is Lean's dependent-pair (sigma) type: an element bundles an
+object $X$, an object $Y$, and a morphism $X \to Y$ into one piece of data, giving a uniform
+way to talk about ``an arbitrary morphism of $\calC$,'' regardless of its endpoints, as a
+single mathematical object one can quantify over or compare for equality. This idiom recurs (Definition~\ref{def:pair-fraction}). \lcode{MorphismProperty C} is
+Mathlib's type of predicates on morphisms of $\calC$ (formally,
+\lcode{∀ ⦃X Y⦄, (X ⟶ Y) → Prop}), exactly the data needed to describe ``a collection of
+morphisms'' without committing to how that collection is presented; \lc{CenterMorphismProperty}
+is the \lc{MorphismProperty} cut out by $\Sigma$. Feeding this \lc{MorphismProperty} to
+Mathlib's localization construction from \S\ref{sec:localization} gives, with no further
+work, the raw localization $\calC[\Sigma^{-1}]$ and its canonical functor:
+
+\begin{leancode}
+def CenterLocalization : Type u := (CenterMorphismProperty Z).Localization \\[0.5\baselineskip]
+def LocalizationFunctor : C ⥤ (CenterMorphismProperty Z).Localization := \\
+  (CenterMorphismProperty Z).Q \\
+\end{leancode}
+
+This localization $\calC[\Sigma^{-1}]$, inverting every $d_i$ and forgetting every $N_i$, is
+not the dilatation; it will however reappear constantly, in two roles: as the target of a
+faithfulness hypothesis controlling uniqueness in the universal property
+(\S\ref{sec:universal-property}), and, in the special case where every $N_i$ is taken to be
+the largest possible sieve, as the dilatation itself:
+
+\begin{fact}[{\citep[Fact~2.15]{Mayeux}}]
+\label{fact:localization-is-dilatation}
+If $N_i = S_{\id_{\cod(d_i)}}$ (the sieve of every morphism into $\cod(d_i)$) for
+every $i \in I$, then the dilatation $\calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}]$ is canonically
+isomorphic to the raw localization $\calC[\Sigma^{-1}]$.
+\end{fact}
+
+Taking every $N_i$ maximal forces every morphism into $\cod(d_i)$ to factor through $d_i$,
+which forces $d_i$ itself to become invertible: dilating by the maximal sieve is exactly
+localizing. In Lean, \lc{Center.ofMorphisms} builds the center with this maximal choice of
+sieve (\lcode{N := fun _ => ⊤}), and \lc{Fact_2_15} is the resulting isomorphism of
+categories; \S\ref{sec:dict-5} of the appendix records how, combined with
+Theorem~\ref{thm:universal-property}, this recovers \citep[Proposition~2.8]{Mayeux}'s classical universal
+property of localization (\S\ref{sec:localization}) as a special case of
+Theorem~\ref{thm:universal-property} rather than as a separately proved fact.
+
+\section{Building the dilatation as a quotient of a generated category}
+\label{sec:dilatation-construction}
+
+We now fix a center $Z = \{(d_i,N_i)\}_{i\in I}$ in $\calC$ and describe how the
+formalization builds the dilatation $\calC'$. This section is the most consequential design
+decision in the whole formalization: the route taken here is not the route of the original
+paper, and the difference propagates through every later proof.
+
+\subsection{The cost of formalizing fraction sequences directly}
+
+Informally (and in the original exposition of this material), a morphism of the dilatation
+$\calC'$ is an equivalence class of a $\{(d_i,N_i)\}_{i\in I}$-fraction: a
+$\Sigma$-sequence in the graph $\mathcal G$ of \S\ref{sec:localization} of the special shape
+\[
+X_1 \xrightarrow{n_1} Y_1 \xrightarrow{\ell_{d_{i_1}}} X_2 \xrightarrow{n_2} Y_2
+\xrightarrow{\ell_{d_{i_2}}} X_3 \cdots X_k \xrightarrow{n_k} Y_k
+\xrightarrow{\ell_{d_{i_k}}} X_{k+1} \xrightarrow{a} X_{k+2},
+\]
+with $a$ an arbitrary morphism of $\calC$, $k \geq 0$, and $n_j \in N_{i_j}$ for every $j$.
+Composition of such fractions, and the well-definedness of composition on equivalence
+classes, are then checked directly, generalizing \citep[Fact~2.6]{Mayeux}'s computation
+($\ell_{d'}\circ \ell_d = \ell_{d''}$ when $d,d'$ compose to a further central morphism
+$d''$). Carried out by hand, in Lean, on explicit equivalence classes of sequences, this
+would require reproving associativity of composition (\citep[Fact~2.11]{Mayeux} in the original numbering)
+essentially from scratch, in a shape special enough that none of Mathlib's existing
+localization machinery applies directly. For a compiling formalization of this approach, see \citep{MayDil} (this paper was not primarily concerned with formalizing dilatations of categories; dilatations of categories were an example of an ongoing formalization effort, and it was indicated there that the formalization choices were not final).
+
+\subsection{The route taken: a freely generated category, then a quotient}
+
+The formalization instead builds $\calC'$ in two stages, each reusing a piece of Mathlib's
+generic category-theoretic infrastructure.
+
+\textbf{Stage 1: a quiver of generators.}
+\label{def:pair-fraction}
+Define a quiver (a directed graph, with no
+composition structure yet) on the objects of $\calC$, with two kinds of edges: one
+original edge $X \to Y$ for every morphism $a : X \to Y$ of $\calC$, and one
+fraction edge $\dom(n) \to \dom(d_i)$ for every $i \in I$ and every $n \in N_i$, namely the
+data of a pair $(i,n)$, which we call, following \S\ref{sec:organization}'s terminology, a
+$\{(d_i,N_i)\}_{i\in I}$-fraction generator. This
+is exactly the data needed to write down one instance of the factorization triangle
+\eqref{eq:intro-triangle}: the fraction edge for $(i,n)$ is a name for the morphism $b$ that
+triangle asks for.
+
+\begin{leancode}
+def CenterSievePair : Type (max u v) := \\
+  Σ i : Z.I, Σ X : C, { f : X ⟶ Z.cod i // Z.N i f } \\[0.5\baselineskip]
+inductive GeneratorMorphismData (Z : Center C) {X Y : (CenterMorphismProperty Z).Localization} \\
+    (f : X ⟶ Y) : Type (max u v) \\
+  | fraction : PairMorWitness Z f → GeneratorMorphismData Z f \\
+  | original : OriginalWitness Z f → GeneratorMorphismData Z f \\[0.5\baselineskip]
+def GeneratorQuiver : Quiver (CenterMorphismProperty Z).Localization where \\
+  Hom X Y := Σ f : X ⟶ Y, GeneratorMorphismData Z f \\
+\end{leancode}
+A \lc{CenterSievePair} bundles an index $i$, an object $X$, and a witness that some
+$n : X \to \cod(d_i)$ lies in $N_i$, precisely the data $(i,n)$ indexing a fraction edge.
+The quiver itself is built, slightly indirectly, on the objects of the raw
+localization $\calC[\Sigma^{-1}]$ rather than directly on the objects of $\calC$ (the two
+are in canonical bijection, via Mathlib's \lc{objEquiv}, since localization is the identity
+on objects); this lets both kinds of generator edges (an original morphism of $\calC$, or
+a fraction witnessed by a \lc{CenterSievePair}) be compared for equality as
+morphisms of the raw localization, which is exactly what is needed a few lines below to
+formulate the congruence of Stage~2. \lcode{GeneratorMorphismData Z f} records why a
+given morphism $f$ of the raw localization arises as a generator: either it is (the image
+of) an original morphism of $\calC$ (constructor \lc{original}), or it is (the image of) a
+fraction-witness composite $n \circ \ell_{d_i}$ built from a \lc{CenterSievePair}
+(constructor \lc{fraction}).
+
+That underlying composite is not left informal: it is constructed in three named steps,
+descending through the levels of Mathlib's localization construction
+(\S\ref{sec:localization}) --- first as a path in the path category of the localization
+quiver, then as its class in the raw localization.
+
+\begin{leancode}
+def inv_in_path (p : CenterSievePair Z) : \\
+    ιPaths (CenterMorphismProperty Z) (Z.cod p.1) ⟶ ιPaths (CenterMorphismProperty Z) (Z.dom p.1) := \\
+  Localization.Construction.ψ₂ (CenterMorphismProperty Z) (Z.mor p.1) ⟨p.1, rfl⟩ \\[0.5\baselineskip]
+def fraction_in_path_single (p : CenterSievePair Z) : \\
+    ιPaths (CenterMorphismProperty Z) (p.2.1) ⟶ ιPaths (CenterMorphismProperty Z) (Z.dom p.1) := \\
+  Localization.Construction.ψ₁ (CenterMorphismProperty Z) p.2.2.1 ≫ inv_in_path Z p \\[0.5\baselineskip]
+def fraction_in_loc_single (p : CenterSievePair Z) : \\
+    objEquiv (CenterMorphismProperty Z) (p.2.1) ⟶ objEquiv (CenterMorphismProperty Z) (Z.dom p.1) := \\
+  (CategoryTheory.Quotient.functor (relations (CenterMorphismProperty Z))).map (fraction_in_path_single Z p) \\
+\end{leancode}
+
+Here $\psi_1$ and $\psi_2$ are Mathlib's names (in \lc{Localization.Construction}) for the
+length-one path on an original edge, respectively on a formal-inverse edge, of the
+localization quiver \lc{LocQuiver} of \citep[Definition~2.2]{Mayeux}. So
+\lcode{inv_in_path Z p} is (the length-one path on) the edge $\ell_{d_i}$ for the inverted
+morphism $d_i$, and \lcode{fraction_in_path_single Z p} is the path-level composite
+$n \circ \ell_{d_i}$ (in diagrammatic order, $\psi_1(n)$ followed by \lc{inv_in_path}).
+Applying the quotient functor of the raw localization yields
+\lcode{fraction_in_loc_single Z p}, the class of this composite in $\calC[\Sigma^{-1}]$;
+this is exactly the morphism that \lc{IsPairMor} and \lc{PairMorWitness} --- and through
+them the constructor \lc{fraction} above --- compare against, and it resurfaces in
+\S\ref{sec:theta-properties} as the underlying morphism of the fraction generator edge.
+
+\textbf{Stage 2: freely generate, then quotient.} Mathlib's \lc{CategoryTheory.Paths} functor
+turns any quiver into a category: the path category, whose morphisms are finite paths
+of edges, with composition given by concatenation, and associativity holding by construction
+(concatenation of lists is associative). Applying it to \lcode{GeneratorQuiver Z} gives a
+category \lcode{GeneratedCategory Z} whose morphisms are exactly the $\{(d_i,N_i)\}$-fractions
+of the informal description above, without yet imposing any relations between different
+paths representing ``the same'' fraction.
+
+\begin{leancode}
+def GeneratedCategory := CategoryTheory.Paths (GeneratorObjects Z) \\
+instance : Category (GeneratedCategory Z) := Paths.categoryPaths _ \\
+\end{leancode}
+
+To obtain $\calC'$, this free category must still be quotiented by the relations that make
+two representative sequences of the same fraction equal, exactly the informal content of
+\citep[Definition~2.4]{Mayeux}'s elementary equivalences, transported to this setting. Rather than
+re-deriving these relations combinatorially, the formalization defines the congruence
+directly by reference to the raw localization, whose associated equivalence relation on
+sequences is already correctly set up by Mathlib (\S\ref{sec:localization}):
+
+\begin{leancode}
+def GeneratedToLocalization : GeneratedCategory Z ⥤ (CenterMorphismProperty Z).Localization := \\
+  CategoryTheory.Paths.lift (forgetGenerator Z) \\[0.5\baselineskip]
+def DilaRel : HomRel (GeneratedCategory Z) := \\
+  fun {_ _} f g => (GeneratedToLocalization Z).map f = (GeneratedToLocalization Z).map g \\[0.5\baselineskip]
+def Dila := CategoryTheory.Quotient (DilaRel Z) \\
+instance : Category (Dila Z) := CategoryTheory.Quotient.category _ \\
+\end{leancode}
+Here \lc{forgetGenerator} is the evident prefunctor forgetting the \lc{GeneratorMorphismData}
+tag and remembering only the underlying morphism of the raw localization, and
+\lc{Paths.lift} turns this prefunctor into an honest functor
+\lcode{GeneratedToLocalization Z}, a functor \lcode{GeneratedCategory Z} $\to$ $\calC[\Sigma^{-1}]$ out of the
+free category (again by the universal property of the path-category construction: a functor
+out of a free category on a quiver is the same thing as a prefunctor on that quiver). Two
+paths are declared \lc{DilaRel}-related exactly when they become equal after mapping to the
+raw localization, i.e., exactly when they represent the same $\Sigma$-fraction, ignoring
+the extra bookkeeping of which $N_i$'s were used. Finally, \lcode{Dila Z} is defined as the
+quotient category \lcode{CategoryTheory.Quotient (DilaRel Z)}, another piece of generic Mathlib
+infrastructure: given any category and any relation on its \lc{Hom}-sets, \lc{Quotient}
+produces the quotient category, with composition well-defined automatically because the
+construction proves once and for all that the smallest congruence containing a given relation is
+compatible with composition (the \lc{Congruence} typeclass, instantiated here in three lines
+by reflexivity/symmetry/transitivity of equality and compatibility of \lc{Functor.map} with
+composition).
+
+\begin{designchoice}
+This two-stage route (free category on a quiver of generators, then quotient by
+``agreement after forgetting to the raw localization'') trades a bespoke combinatorial
+argument (associativity and well-definedness of fraction composition, checked by hand on
+representative sequences) for two invocations of general-purpose machinery
+(\lc{Paths.categoryPaths}{} for associativity of the free category, \lc{Quotient.category}
+for well-definedness of the quotient), at the cost of introducing an auxiliary category,
+\lcode{GeneratedCategory Z}, that has no name in the original exposition. This auxiliary
+category is not merely a bookkeeping device: since \lcode{Dila Z} is a quotient of it and
+quotient functors are full onto their generators, Theorem~\ref{thm:universal-property} is
+proved by induction on it, via \lc{GeneratedCategory\_morphism\_induction}.
+\end{designchoice}
+
+\subsection{The comparison with the raw localization is faithful}
+
+Writing $\calC'$ for \lcode{Dila Z}, the functor \lcode{GeneratedToLocalization Z} used to define
+\lc{DilaRel} descends, by construction, to a functor \lcode{DilaToLoc Z}, of type
+$\calC' \to \calC[\Sigma^{-1}]$ (forgetting, once again, the sieve data and remembering only
+which morphisms of $\calC$ were inverted).
+
+\begin{fact}[{\citep[Fact~2.14]{Mayeux}}]
+\label{fact:faithful-into-localization}
+The functor \lcode{DilaToLoc Z} $: \calC' \to \calC[\Sigma^{-1}]$ is faithful.
+\end{fact}
+
+This is the first structural fact about $\calC'$, and it already illustrates the payoff of
+the two-stage construction: since two morphisms of $\calC'$ agree if and only if they are
+represented by paths that are \lc{DilaRel}-related, i.e.\ paths with the same image in
+$\calC[\Sigma^{-1}]$ by definition of \lc{DilaRel}, faithfulness of
+\lcode{DilaToLoc Z} is close to a tautology once phrased this way: given
+$f, g$ with the same image, \lc{Quot.sound} (Lean's principle that provably-related
+representatives of a quotient give equal classes) directly produces $f=g$ in $\calC'$. The
+formalized proof is a few lines unfolding the quotient's \lc{Hom}-type as a \lc{Quot} of paths
+and invoking exactly this principle. Contrast this with proving faithfulness directly from an
+explicit description of fraction composition, which would require re-deriving that
+$\calC'$'s equivalence classes inject into $\calC[\Sigma^{-1}]$'s, again the associativity
+argument that \S 4.2 exchanges for machinery.
+
+\section{The canonical functor and its universal property}
+\label{sec:universal-property}
+
+\subsection{The canonical functor and the fraction morphisms}
+\label{sec:theta-properties}
+
+Every object of $\calC$ is, tautologically, an object of $\calC' = $\lcode{Dila Z} (both
+categories share the same objects as $\calC[\Sigma^{-1}]$ and as the raw generated category);
+every morphism $a$ of $\calC$ gives, via the ``original'' generator edge it defines, a
+morphism of $\calC'$. This assembles into a functor.
+
+\begin{proposition}[{\citep[Proposition~3.1(i)]{Mayeux}}]
+There is a canonical functor $\Theta : \calC \to \calC'$, the identity on objects, sending a
+morphism $a$ of $\calC$ to the class of the length-one path on the corresponding original
+generator edge.
+\end{proposition}
+
+In Lean this is \lcode{CatToDila Z}, built directly from the quiver embedding
+\lc{CToGeneratorQuiver} of \S\ref{sec:dilatation-construction}, composed with the quotient
+functor \lcode{Quotient.functor (DilaRel Z)}; functoriality (respecting identities and
+composition) is checked by unfolding both sides in the raw localization
+$\calC[\Sigma^{-1}]$, where it is immediate.
+
+The second half of \citep[Proposition~3.1]{Mayeux} is the existence, for every $i \in I$ and $n \in N_i$, of
+the fraction morphism $b$ solving the triangle \eqref{eq:intro-triangle}, and this is, by
+construction, exactly what a fraction generator edge is.
+
+\begin{proposition}[{\citep[Proposition~3.1(ii)]{Mayeux}}]
+\label{prop:fraction-exists}
+For every $i \in I$, $n \in N_i$, there is a (unique, see
+Theorem~\ref{thm:universal-property} below) morphism $b : \dom(n) \to \dom(d_i)$ in $\calC'$
+with $\Theta(d_i) \circ b = \Theta(n)$.
+\end{proposition}
+
+\begin{leancode}
+def fraction_in_dila_single (p : CenterSievePair Z) : \\
+    (CatToDila Z).obj p.2.1 ⟶ (CatToDila Z).obj (Z.dom p.1) := \\
+  (GeneratedToDila Z).map (Quiver.Hom.toPath (fraction_in_generated Z p)) \\
+\end{leancode}
+i.e.\ $b$ is, once again, literally a name for the corresponding generator edge, viewed in
+$\calC'$ instead of in the free category. Unwinding the definitions, this is the top of the
+ladder begun in \S\ref{def:pair-fraction}: \lcode{fraction_in_generated Z p} is the
+generator edge whose underlying raw-localization morphism is
+\lcode{fraction_in_loc_single Z p}, itself the class of the path-level composite
+\lcode{fraction_in_path_single Z p}, i.e.\ of \ensuremath{\psi_1}\lcode{ n }\ensuremath{\gg}\lcode{ inv_in_path Z p} --- so the
+chain \lc{inv_in_path} $\to$ \lc{fraction_in_path_single} $\to$ \lc{fraction_in_loc_single}
+$\to$ \lc{fraction_in_generated} $\to$ \lc{fraction_in_dila_single} consists of successive
+reinterpretations of the single composite $n \circ \ell_{d_i}$, ending in $\calC'$. The defining equation
+$\Theta(d_i) \circ b = \Theta(n)$ (\lc{fraction_in_dila_comp_mor}) is proved by
+\lc{Quotient.sound}, reducing to a one-line computation in the raw localization exactly as in
+Fact~\ref{fact:faithful-into-localization}. Uniqueness of $b$ is deliberately not
+proved at this point in the formalization: it is deferred to, and falls out of,
+Theorem~\ref{thm:universal-property}, since it is a special case of the uniqueness half of
+the universal property applied to $F = \Theta$ itself. This is a first small instance of a
+recurring pattern: rather than proving uniqueness statements piecemeal, the formalization
+proves the strongest available uniqueness principle once (Theorem~\ref{thm:universal-property})
+and specializes it repeatedly.
+
+Recall that a bimorphism is a morphism that is both mono and epi.
+
+\begin{fact}[{\citep[Fact~3.2]{Mayeux}}]
+The image of a morphism under a faithful functor being a bimorphism forces the morphism
+itself to be a bimorphism.
+\end{fact}
+
+This is a general categorical fact, with a two-line proof by cancellation (if $F(f)$ is mono
+and $a\circ f = b\circ f$ then $F(a)\circ F(f) = F(b)\circ F(f)$, so $F(a)=F(b)$ by
+cancelling the mono $F(f)$, so $a=b$ by faithfulness; dually for epi), formalized as
+\lc{Fact_3_2} for an arbitrary faithful $F$, not specialized to $\Theta$.
+
+\begin{proposition}[{\citep[Proposition~3.3]{Mayeux}}]
+For every $i \in I$, $\Theta(d_i)$ is a bimorphism in $\calC'$.
+\end{proposition}
+
+Indeed \lcode{DilaToLoc Z} is faithful (Fact~\ref{fact:faithful-into-localization}) and sends
+$\Theta(d_i)$ to an isomorphism of $\calC[\Sigma^{-1}]$ (localizations invert every generator
+by construction), and isomorphisms are bimorphisms; \citep[Fact~3.2]{Mayeux} concludes.
+
+\subsection{Sieve inclusion and $\Sigma$-regularity}
+\label{sec:sigma-regular}
+
+Two more ingredients are needed before the universal property can be stated: a sieve
+inequality tracking how $\Theta$ interacts with the sieves $N_i$, and a faithfulness
+condition on the target functor $F$ playing the role that faithfulness of
+\lcode{DilaToLoc Z} plays for $\Theta$ itself.
+
+For $i \in I$, write $S_{\Theta(N_i)}$ for the sieve over $\Theta(\cod(d_i))$ generated by
+$\{\Theta(n) \mid n \in N_i\}$, and $S_{\Theta(d_i)}$ for the sieve generated by the single
+morphism $\Theta(d_i)$.
+
+\begin{proposition}[{\citep[Proposition~3.5]{Mayeux}}]
+\label{prop:sieve-inclusion}
+For every $i \in I$, $S_{\Theta(N_i)} \subset S_{\Theta(d_i)}$.
+\end{proposition}
+
+This says precisely that every morphism of $S_{\Theta(N_i)}$ (a composite $\Theta(n)\circ t$
+with $n \in N_i$) factors through $\Theta(d_i)$; and indeed it does, through
+$b \circ t$ with $b$ the fraction morphism of Proposition~\ref{prop:fraction-exists}. In Lean,
+\lc{CatToDila_image_sieve_le_singleton} proves this by producing this explicit factorization:
+unfolding membership in a pushforward sieve (Mathlib's \lc{Sieve.functorPushforward}, used
+here to express $S_{\Theta(N_i)}$ as the pushforward of $N_i$ along $\Theta$) down to a
+witness $(Y,h,g,hg,\text{rfl})$, and exhibiting $g \circ $\lc{fraction_in_dila_single}$(i,h)$ as
+the required factorization, via the \lc{calc} chain
+\[
+(g \circ b) \circ \Theta(d_i) = g \circ (b \circ \Theta(d_i)) = g \circ \Theta(h).
+\]
+
+\begin{definition}[{\citep[Definition~3.6]{Mayeux}}]
+\label{def:sigma-regular}
+A functor $F : \calC \to \calD$ is $\Sigma$-regular if the canonical functor
+$\calD \to \calD[F(\Sigma)^{-1}]$ is faithful.
+\end{definition}
+
+In Lean, $\Sigma$-regularity is recorded as a \lc{Prop}, \lcode{IsSigmaRegular Z F}, defined as
+faithfulness of \lcode{(ImageCenterMorphismProperty Z F).Q}, where
+\lcode{ImageCenterMorphismProperty Z F} is the collection of morphisms of $\calD$ that are
+images under $F$ of some $d_i$. This is deliberately not framed as membership in a
+comma category $Cat_\calC^{\Sigma\text{-reg}}$ (the original exposition's route): the
+formalization never needs to talk about morphisms between $\Sigma$-regular functors,
+only about individual functors being $\Sigma$-regular, so recording only the property, not
+the category structure around it, avoids building infrastructure that is never used.
+
+\begin{fact}[{\citep[Fact~3.7]{Mayeux}}]
+\label{fact:theta-regular}
+$\Theta : \calC \to \calC'$ is $\Sigma$-regular.
+\end{fact}
+
+Since $\Theta$ inverts, in $\calC'$, exactly the same morphisms of $\calC'$ that
+\lcode{DilaToLoc Z} inverts (both localizations at the images of $\{d_i\}$ under a functor
+identifying $\calC'$ and, further down the line, $\calC[\Sigma^{-1}]$, agree), this follows
+formally from Fact~\ref{fact:faithful-into-localization} together with the following purely
+categorical lemma, which is stated once and used twice:
+
+\begin{leancode}
+theorem faithful_of_comp_faithful \\
+    (p : C₁ ⥤ C₂) (e : C₂ ⥤ C₃) (hfaith : (p ⋙ e).Faithful) : \\
+    p.Faithful := by \\
+  constructor \\
+  intro X Y f g h \\
+  apply hfaith.map_injective \\
+  simp only [Functor.comp_map, h] \\
+\end{leancode}
+
+\begin{designchoice}
+This lemma (``a functor that factors, on the target side, through a faithful functor is
+itself faithful'') is the single fact driving both \citep[Fact~3.7]{Mayeux} above and the following
+fact, which does not otherwise appear as a named result in this section but is used
+repeatedly in \S\ref{sec:combining}:
+\begin{quote}
+If $\Sigma' \subset \Sigma$ and the localization $\calC \to \calC[\Sigma^{-1}]$ is faithful,
+then $\calC \to \calC[\Sigma'^{-1}]$ is also faithful.
+\end{quote}
+The original exposition proves this by a triangle-of-functors argument specific to
+localizations ($\calC[\Sigma^{-1}] \cong \calC[\Sigma'^{-1}][\dots]$, then cancel). The
+formalization instead isolates the one-line categorical fact both arguments really rest on,
+and proves it once, in a universe-polymorphic form (\lc{faithful_of_comp_faithful_gen}) so
+that it applies uniformly regardless of which universes the three categories involved happen
+to live in.
+\end{designchoice}
+
+\subsection{The universal property}
+\label{sec:universal-property-statement}
+
+We can now state the theorem that makes $\calC'$ the dilatation of $\calC$ with center $Z$,
+rather than merely a category equipped with a functor satisfying the factorization
+triangle \eqref{eq:intro-triangle}.
+
+\begin{theorem}[{\citep[Theorem~3.10]{Mayeux}}]
+\label{thm:universal-property}
+Let $F : \calC \to \calD$ be a functor such that
+\begin{enumerate}
+\item[(1)] for every $i \in I$, $S_{F(N_i)} \subset S_{F(d_i)}$ (the sieve generated by
+  $\{F(n) \mid n\in N_i\}$ is contained in the sieve generated by $F(d_i)$ alone), and
+\item[(2)] $F$ is $\Sigma$-regular (Definition~\ref{def:sigma-regular}).
+\end{enumerate}
+Then there is a unique functor $F' : \calC' \to \calD$ with $F' \circ \Theta = F$.
+\end{theorem}
+
+Condition (1) is exactly what is needed for existence: it says every generator edge of
+$\calC'$ can plausibly be sent somewhere in $\calD$ compatibly with $F$. Condition (2) is
+exactly what is needed for uniqueness: it says $\calD$ cannot ``accidentally'' identify
+two things that a correct choice of $F'$ would have to keep apart. In Lean:
+
+\begin{leancode}
+theorem Dila_universal_property \\
+    (F : C ⥤ D) \\
+    (hfaith : (ImageCenterLocalizationFunctor Z F).Faithful) \\
+    (hsieve : ∀ (i : Z.I), \\
+      Sieve.functorPushforward F (Z.N i) ≤ \\
+        Sieve.generate (Presieve.singleton (F.map (Z.mor i)))) : \\
+    ∃! (G : Dila Z ⥤ D), CatToDila Z ⋙ G = F \\
+\end{leancode}
+with \lc{hfaith} phrased, as in Definition~\ref{def:sigma-regular}, via the auxiliary
+localization \lcode{ImageCenterLocalizationFunctor Z F} (the localization of $\calD$ at the
+images of the $d_i$'s under $F$), and \lc{hsieve} the Lean transcription of condition~(1),
+using \lc{Sieve.functorPushforward} for ``the sieve generated by the image of $N_i$.''
+
+\begin{designchoice}
+The theorem is stated with (1) and (2) as two separate, named hypotheses, rather than as
+``$F$ is an object of $Cat_\calC^{\Sigma\text{-reg}}$ satisfying the sieve inequalities,''
+continuing the choice already made in Definition~\ref{def:sigma-regular} not to formalize
+the comma category itself. Nothing is lost: an $F$ satisfying both hypotheses is exactly an
+object of $Cat_\calC^{\Sigma\text{-reg}}$ satisfying the sieve inequalities, and every use of
+the theorem below supplies the two hypotheses directly rather than by first constructing a
+comma-category object and then checking the sieve inequalities for it.
+\end{designchoice}
+
+The proof splits, as it must, into existence and uniqueness, and (this is the payoff of
+\S\ref{sec:dilatation-construction}'s two-stage construction) both halves are organized
+around the same induction principle, which we state first.
+
+\begin{lemma}[Induction on the generated category]
+\label{lem:induction}
+Let $P$ be a property of morphisms of \lcode{GeneratedCategory Z}. If $P$ holds of every
+identity, is closed under composition, and holds of every single generator edge, then $P$
+holds of every morphism.
+\end{lemma}
+
+\begin{leancode}
+lemma GeneratedCategory_morphism_induction \\
+    (P : ∀ {X Y : GeneratedCategory Z}, (f : X ⟶ Y) → Prop) \\
+    (h_id : ∀ X, P (𝟙 X)) \\
+    (h_comp : ∀ {X Y W} (f : X ⟶ Y) (g : Y ⟶ W), P f → P g → P (f ≫ g)) \\
+    (h_gen : ∀ {A B : GeneratorObjects Z} (g : (GeneratorQuiver Z).Hom A B), \\
+      P (Quiver.Hom.toPath g)) : \\
+    ∀ {X Y : GeneratedCategory Z} (f : X ⟶ Y), P f \\
+\end{leancode}
+This is Mathlib's own induction principle for the free category on a quiver
+(\lc{CategoryTheory.Paths.induction}: every path is empty, or a shorter path plus one edge),
+restated via $\ggg$ instead of Mathlib's internal \lc{cons} representation. Since
+\lcode{GeneratorQuiver Z}'s edges are exactly the two kinds of generators of
+\S\ref{sec:dilatation-construction}, an equivalent restatement of Lemma~\ref{lem:induction} is:
+to check a property closed under composition and holding on identities, it suffices to
+check it on every $\Theta(a)$, $a \in \Mor\calC$, and on every fraction morphism $b$. This
+restatement is what is actually invoked at each of the three call sites below.
+
+\subsubsection{Existence}
+
+The construction of $F'$ proceeds generator by generator. On an original generator, there is
+only one sensible choice: send $\Theta(a) \mapsto F(a)$. On a fraction generator $(i,n)$,
+condition~(1) says $F(n)$ lies in the sieve $S_{F(d_i)}$, i.e.\ $F(n) = q \circ F(d_i)$ for
+some $q$; condition~(2) (via \citep[Fact~3.2]{Mayeux}, applied to the faithful localization functor of
+condition~(2)) makes $F(d_i)$ a bimorphism, hence $q$ is unique. This local,
+generator-by-generator choice is fixed first:
+
+\begin{leancode}
+def uniqueFactor_D (hfaith : ...) (hsieve : ...) (i : Z.I) (Y : C) \\
+    (n : Y ⟶ Z.cod i) (hn : Z.N i n) : F.obj Y ⟶ F.obj (Z.dom i) := \\
+  Classical.choose (exists_unique_factor_D Z F hfaith hsieve i (F.obj Y) (F.map n) ...) \\
+\end{leancode}
+and then assembled into a prefunctor \lc{Gq} on \lcode{GeneratorQuiver Z} (sending an original
+edge to $F(a)$ and a fraction edge $(i,n)$ to \lc{uniqueFactor_D} applied to $(i,n)$), which
+Mathlib's \lc{Paths.lift} turns into an honest functor
+$H : $\lcode{GeneratedCategory Z}$ \to \calD$ out of the free category, the same universal
+property of free categories used to build \lc{GeneratedToLocalization} in
+\S\ref{sec:dilatation-construction}, now used to build $H$ instead.
+
+It remains to descend $H$ along the quotient by \lc{DilaRel}, i.e., to check that $H$
+sends \lc{DilaRel}-related paths to equal morphisms of $\calD$, and this is where
+condition~(2) is used a second time, more globally. The key intermediate step is:
+\begin{quote}
+$H$ followed by the localization $\calD \to \calD[F(\Sigma)^{-1}]$ agrees, as a
+functor, with \lcode{GeneratedToLocalization Z} followed by the comparison functor
+$\calC[\Sigma^{-1}] \to \calD[F(\Sigma)^{-1}]$ induced by $F$.
+\end{quote}
+This is \lc{generatedLocalization_commutes}, proved by Lemma~\ref{lem:induction}: on
+identities and composites it is immediate; on an original generator it reduces to the
+functoriality of the comparison functor; and on a fraction generator $(i,n)$ it reduces,
+after unwinding both sides, to a cancellation against the (now invertible, in the further
+localization) image of $F(d_i)$, the same bimorphism-cancellation idea as
+Proposition~\ref{prop:sieve-inclusion}, one level further down. Given this compatibility, two
+\lc{DilaRel}-related paths $f,g$ (i.e.\ with the same image in $\calC[\Sigma^{-1}]$) have the
+same image under $H$ followed by localization; since that localization is faithful
+(condition~(2)), $H(f) = H(g)$ in $\calD$ outright. This descent condition is recorded as a
+standalone lemma, \lc{H_descends}, and Mathlib's \lc{CategoryTheory.Quotient.lift} then
+descends $H$ to a named functor --- the formalization's incarnation of $F'$ itself:
+
+\begin{leancode}
+def DilaLift (hfaith : ...) (hsieve : ...) : Dila Z ⥤ D := \\
+  CategoryTheory.Quotient.lift (DilaRel Z) (H Z F hfaith hsieve) \\
+    (fun _ _ f g hfg => H_descends Z F hfaith hsieve f g hfg) \\
+\end{leancode}
+with \lc{GeneratedToDila}$ \ggg $\lc{DilaLift}$ = H$ by construction; unwinding definitions
+on generators recovers the defining equation $F' \circ \Theta = F$, recorded as
+\lc{DilaLift_fac}. Because $F'$ is thus a structural definition (a quotient-lift of a
+path-lift) rather than a witness extracted from an existential, it is directly reusable
+downstream: the comparison functors \lc{restrictPhi}, \lc{Phi315}, and \lc{Alpha'315} of
+\S\ref{sec:restriction} and \S\ref{sec:combining} are literally \lc{DilaLift} applied to the
+relevant $F$, with their defining equations given by \lc{DilaLift_fac} rather than
+re-extracted from an existential at each use.
+
+\begin{designchoice}
+Condition~(2) is needed already in the proof of existence, not only of uniqueness:
+producing $G:\calC'\to\calD$ requires knowing $H$ respects the quotient relation ``agrees
+after further localizing,'' itself a faithfulness statement about the localization on the
+$\calD$ side.
+\end{designchoice}
+
+\subsubsection{Uniqueness}
+
+Suppose $G_1, G_2 : \calC' \to \calD$ both satisfy $\Theta \ggg G_i = F$. They agree on
+objects (both restrict to $F$ on objects of $\calC$, and every object of $\calC'$ is
+$\Theta(X)$ for some $X$). To show they agree on morphisms, Lemma~\ref{lem:induction} is
+invoked once more, transported along $\calC'$: since the quotient functor
+\lc{GeneratedToDila} is full (a general fact about Mathlib's \lc{Quotient}
+construction), every morphism of $\calC'$ is the image of some morphism of
+\lcode{GeneratedCategory Z}, so it suffices to check $G_1, G_2$ agree (up to the evident
+transport along the object-level equality) on images of the two kinds of generators:
+\begin{itemize}
+\item on $\Theta(a)$ for $a \in \Mor \calC$: immediate, both sides equal $F(a)$;
+\item on a fraction morphism $b$ (for $(i,n)$): here the argument is exactly the one sketched
+  in \S\ref{sec:theta-properties} for Proposition~\ref{prop:fraction-exists}'s uniqueness. From
+  $b \circ \Theta(d_i) = \Theta(n)$, applying $G_j$ gives
+  $G_j(b) \circ G_j(\Theta(d_i)) = G_j(\Theta(n)) = F(n)$; since $G_j(\Theta(d_i)) = F(d_i)$
+  by hypothesis, and $F(d_i)$ is mono (condition~(2), via \citep[Fact~3.2]{Mayeux} again), the two equations
+  $G_1(b)\circ F(d_i) = F(n) = G_2(b) \circ F(d_i)$ cancel to $G_1(b) = G_2(b)$.
+\end{itemize}
+This two-case check is recorded as \lc{Generated_factor_unique_map}, and
+Lean's \lc{Functor.ext} (two functors are equal if they agree on objects and, up to
+transport, on morphisms) finishes the proof as \lc{Dila_factor_unique}. Specialized to
+\lc{DilaLift}, this gives \lc{DilaLift_unique} (any $G$ with $\Theta \ggg G = F$ equals
+\lc{DilaLift}), and the Lean statement of Theorem~\ref{thm:universal-property} displayed
+above, \lc{Dila_universal_property}, is then nothing more than the pair
+(\lc{DilaLift_fac}, \lc{DilaLift_unique}) packaged as an $\exists!$.
+
+\begin{designchoice}
+Uniqueness here and uniqueness of the fraction morphism $b$
+(Proposition~\ref{prop:fraction-exists}) are proved by the same cancellation-against-a-mono
+argument, applied to $F(d_i)$ and to $\Theta(d_i)$ respectively; the latter is exactly the
+$F=\Theta$ instance of the former.
+\end{designchoice}
+
+\subsection{A representability corollary}
+
+Restating Theorem~\ref{thm:universal-property} as a bijection statement is immediate and
+convenient for the applications of \S\ref{sec:restriction}--\S\ref{sec:combining}.
+
+\begin{proposition}[{\citep[Proposition~3.12]{Mayeux}}]
+For $F$ a $\Sigma$-regular functor, there exists a (necessarily unique) $F'$ with
+$F' \circ \Theta = F$ if and only if $S_{F(N_i)} \subset S_{F(d_i)}$ for every $i \in I$.
+\end{proposition}
+
+The forward direction is Proposition~\ref{prop:sieve-inclusion} pushed forward along $F'$
+(\citep[Fact~3.11]{Mayeux}: pushforward of a generated sieve along a further functor composes correctly, a
+routine but essential lemma about \lc{Sieve.functorPushforward} used here and, again, in
+\S\ref{sec:combining}); the backward direction is Theorem~\ref{thm:universal-property}
+itself. In Lean, \lc{CatToDila_represents} states exactly this ``iff,'' under the standing
+assumption that $F$ is $\Sigma$-regular, which is more directly usable than the original
+phrasing as a representable-functor statement ($\Theta$ represents a certain
+$Cat_\calC^{\Sigma\text{-reg}} \to \mathrm{Set}$-valued functor): the two are logically
+equivalent, and every place this fact is used below invokes it exactly in the ``iff'' form.
+
+\section{Restricting a center}
+\label{sec:restriction}
+
+The remainder of the paper studies operations that produce new centers, and new dilatations,
+from old ones. The simplest is restriction to a sub-family of indices.
+
+Fix a center $Z=\{(d_i,N_i)\}_{i\in I}$ and a nonempty subset $K \subset I$. Restricting $Z$
+to $K$ (forgetting every pair with $i \notin K$) gives a new center
+$Z|_K = \{(d_i,N_i)\}_{i\in K}$ on the same category $\calC$, hence a new dilatation
+$\calC[\{(d_i)^{-1}\circ N_i\}_{i\in K}]$. Since every $\{(d_i,N_i)\}_{i\in K}$-fraction is in
+particular a $\{(d_i,N_i)\}_{i\in I}$-fraction, there is a canonical comparison functor.
+
+\begin{proposition}[{\citep[Proposition~3.14]{Mayeux}}]
+\label{prop:restriction}
+There is a canonical functor $\Phi : \calC[\{(d_i)^{-1}\circ N_i\}_{i\in K}] \to
+\calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}]$. Moreover:
+\begin{enumerate}
+\item[(i)] \label{prop:restriction-full} if $N_i = S_{d_i}$ for every $i \in I \smallsetminus K$, then $\Phi$ is full;
+\item[(ii)] if $\calC[\Gamma^{-1}] \to \calC[\Sigma^{-1}]$ is faithful, where
+  $\Gamma = \{d_i\}_{i\in K}$, then $\Phi$ is faithful.
+\end{enumerate}
+\end{proposition}
+
+In Lean, \lcode{Center.restrict Z K hK} builds $Z|_K$ (reindexing every field of \lc{Center} along
+the inclusion $K \hookrightarrow I$), and $\Phi$ itself, \lc{restrictPhi}, is produced not by
+hand but as \lc{DilaLift} --- the functor $F'$ of Theorem~\ref{thm:universal-property}
+(\S\ref{sec:universal-property}) --- applied to
+$F = \Theta_I : \calC \to \calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}]$ restricted along $Z|_K$: the
+sieve inequalities of condition~(1) for $Z|_K$ are exactly the $i \in K$ instances of the
+sieve inequalities already known to hold for $\Theta_I$ on the whole of $Z$
+(Proposition~\ref{prop:sieve-inclusion}), and condition~(2) is
+Fact~\ref{fact:theta-regular} for $\Theta_I$, restricted along $K \subset I$ using the generic
+faithfulness-restriction lemma of \S\ref{sec:sigma-regular}. This is an instructive small
+example of the ``prove the universal property once, specialize it everywhere'' pattern: $\Phi$
+is not an ad hoc functor with its own bespoke construction, it is
+Theorem~\ref{thm:universal-property}'s output for a particular choice of target.
+
+\subsection{Fullness: an explicit preimage construction}
+
+Part~(i) needs more than the universal property alone: it requires producing, for an
+arbitrary morphism of $\calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}]$, an explicit preimage under
+$\Phi$. The proof is again organized by Lemma~\ref{lem:induction}, now applied inside the
+target category's generated presentation rather than the source's: every morphism of
+the big dilatation is (the image of) a path built from original and fraction generators, and
+a preimage is constructed by induction on this path.
+
+\begin{leancode}
+def PhiPreimage (Z : Center C) (K : Set Z.I) (hK : K.Nonempty) \\
+    {A B : GeneratedCategory Z} (p : A ⟶ B) : Prop := \\
+  ∃ f : ..., ...
+\end{leancode}
+(the precise statement records the existence of a morphism of the small dilatation mapping,
+under $\Phi$, to the image of $p$). The three structural cases of the induction are handled
+by \lc{PhiPreimage_id} and \lc{PhiPreimage_comp} (trivial: the identity and composition of
+preimages are preimages of the identity and the composition --- the identity case even closes
+by \lc{rfl}, since \lc{restrictPhi}, being the structural \lc{DilaLift} rather than an opaque
+existential witness, makes the object identification $\Phi(\Theta_{Z|_K}(X)) = \Theta_I(X)$
+definitional, so the \lc{eqToHom} transports flanking the identity reduce to identities), and
+the generator case is where
+hypothesis~(i) is used, in \lc{PhiPreimage_edge}: an original generator $\Theta_I(a)$ is
+already in the image of $\Phi$ (take $\Theta_K(a)$); and a fraction generator for $(i,n)$ is
+handled by cases on whether $i \in K$ (again already in the image) or $i \notin K$, in which
+case hypothesis~(i) gives $n = q \circ d_i$ for some $q$, and the fraction morphism for
+$(i,n)$ collapses, under $\Theta_I$, to $\Theta_I(q)$, an original generator, hence again
+manifestly in the image of $\Phi$. Assembling the three cases by induction on the path
+gives \lc{PhiPreimage\_all}, from which fullness
+of $\Phi$, \lc{restrictPhi_full}, follows by transporting an arbitrary morphism of the
+quotient back to a path (using that \lc{GeneratedToDila} is full, as in
+\S\ref{sec:universal-property-statement}), applying \lc{PhiPreimage\_all}, and pushing the
+resulting preimage back down.
+
+\subsection{Faithfulness}
+
+Part~(ii) is more direct: both dilatations map faithfully into their respective raw
+localizations (Fact~\ref{fact:faithful-into-localization}), and $\Phi$ composed with the map
+to the big raw localization factors through the small raw localization (essentially by
+construction of $\Phi$ via the universal property); hypothesis~(ii)'s faithfulness of the
+comparison between the two raw localizations then gives faithfulness of $\Phi$ itself via
+\lc{faithful_of_comp_faithful}, the same one-line categorical lemma from
+\S\ref{sec:sigma-regular} used for \citep[Fact~3.7]{Mayeux} and, again, below.
+
+
+
+\section{Shrinking the sieves}
+\label{sec:subsieve}
+
+A second comparison functor sits alongside Proposition~\ref{prop:restriction}'s $\Phi$:
+rather than dropping indices from $I$, one can shrink each sieve $N_i$ to an arbitrary
+sub-sieve $M_i \subset N_i$, keeping the same family of morphisms $\{d_i\}_{i\in I}$.
+
+\begin{fact}[{\citep[Fact~3.13]{Mayeux}}]
+\label{fact:subsieve}
+Let $Z=\{(d_i,N_i)\}_{i\in I}$ be a center and $M_i \subset N_i$ a sieve over $\cod(d_i)$ for
+every $i$; write $Z_M$ for the center $\{(d_i,M_i)\}_{i\in I}$. There is a canonical functor
+$\varphi : \calC[\{(d_i)^{-1}\circ M_i\}_{i\in I}] \to \calC'$, and $\varphi$ is faithful.
+\end{fact}
+
+As with $\Phi$ in \S\ref{sec:combining-construction}, $\varphi$ (\lc{Fact313Phi}) is built
+directly from Theorem~\ref{thm:universal-property} applied to $\Theta : \calC \to \calC'$:
+$\Sigma$-regularity of $\Theta$ transports unchanged to $Z_M$ (\lc{IsSigmaRegular_altSieve},
+since $Z_M$ shares the same underlying $\Sigma$ as $Z$), and the sieve inequality is the
+subsieve inclusion $M_i \subset N_i$ composed with Proposition~\ref{prop:sieve-inclusion}'s
+inequality for $Z$. Faithfulness is where the shared-$\Sigma$ observation pays off a second
+time: since $Z_M$ and $Z$ have the same $\Sigma$, they have the same raw localization
+and the same functor $L=$\lc{LocalizationFunctor}, so $\varphi \ggg$\lc{DilaToLoc}$\ Z$ and
+\lc{DilaToLoc}$\ Z_M$ both factor $L$ through $\Theta_{Z_M}$, so \lc{Dila_factor_unique}
+identifies them outright, and \lc{DilaToLoc}$\ Z_M$ is faithful unconditionally
+(Fact~\ref{fact:faithful-into-localization}), so \lc{faithful_of_comp_faithful} gives
+faithfulness of $\varphi$. No new machinery appears anywhere in this proof: it is
+Theorem~\ref{thm:universal-property}, \lc{Dila_factor_unique}, and
+\lc{faithful_of_comp_faithful} once more, the same three tools already doing the load-bearing
+work throughout \S\ref{sec:restriction}--\S\ref{sec:combining}.
+
+\begin{designchoice}
+The printed proof is one sentence (an $M$-fraction is already an $N$-fraction, so $\varphi$ is
+the identity on representatives); that does not transport here, since the two dilatations are
+quotients of different generated categories, so $\varphi$ is instead built from
+Theorem~\ref{thm:universal-property} and \lc{Dila_factor_unique}.
+\end{designchoice}
+
+\section{Combining two centers}
+\label{sec:combining}
+
+The second, and by far the most delicate, operation on centers combines two centers
+on the same category into one, and relates the resulting dilatation to an iterated
+dilatation, first dilate by one center, then dilate the result by (the pushforward of) the
+other. We present this section in the order the formalization itself builds it: first the
+construction and the six declarations it produces, entirely in the terms the source file
+uses, and only afterward do we state the corresponding result of the printed paper
+(\citep[Proposition~3.15]{Mayeux}) and compare the two. This reordering is not merely stylistic: for this
+particular result, the printed statement and the formal one turn out not to say quite the
+same thing, and the difference is easiest to see after the formal construction is already on
+the table, not before.
+
+\subsection{The construction, in the order the formalization builds it}
+\label{sec:combining-construction}
+
+Fix two centers $Z = \{(d_i,N_i)\}_{i\in I}$ and $W = \{(d_j,N_j)\}_{j\in J}$ on the same
+category $\calC$.
+
+\subsubsection*{The combined center}
+The formalization first forms the center that simply puts $Z$ and $W$ side by side, indexed
+by the disjoint union $I \sqcup J$:
+\begin{leancode}
+def Center.sum (Z W : Center C) : Center C where \\
+  I := Z.I ⊕ W.I \\
+  nonempty := ⟨Sum.inl Z.nonempty.some⟩ \\
+  dom := Sum.elim Z.dom W.dom \\
+  cod := Sum.elim Z.cod W.cod \\
+  mor := fun i => match i with | Sum.inl i => Z.mor i | Sum.inr j => W.mor j \\
+  N   := fun i => match i with | Sum.inl i => Z.N i   | Sum.inr j => W.N j \\
+\end{leancode}
+every field is simply routed to the $Z$- or the $W$-side by cases on the summand. Two
+immediate containment facts about the associated collections of central morphisms,
+\lc{CenterMorphismProperty_sum_inl_le} and \lc{CenterMorphismProperty_sum_inr_le}
+(each a two-line proof: an index witnessing $f \in \Sigma_Z$ or $f\in\Sigma_W$ certainly
+witnesses $f \in \Sigma_{Z\sqcup W}$, via \lc{Sum.inl} or \lc{Sum.inr}), together with
+their $F$-image analogues \lc{ImageCenterMorphismProperty_sum_inl_le} and
+\lc{...\_sum_inr_le} for an arbitrary functor $F$ out of $\calC$, are recorded once and
+reused repeatedly below: they are the only place the definition of \lc{Center.sum} is
+unfolded directly, everything else works with these two containments as a black box.
+
+\subsubsection*{Regularity of $\Theta_{Z\sqcup W}$ on each side}
+Before anything is built, the formalization records that $\Theta_{Z\sqcup W} : \calC \to
+\calC_{Z\sqcup W}$ (which is already known to be $\Sigma_{Z\sqcup W}$-regular, as an
+instance of Fact~\ref{fact:theta-regular} applied to the combined center) remains regular
+when restricted to either half of the index set:
+\begin{leancode}
+lemma CatToDila_isSigmaRegular_sum_inl (Z W : Center C) : \\
+    IsSigmaRegular Z (CatToDila (Z.sum W)) := by \\
+  show (ImageCenterMorphismProperty Z (CatToDila (Z.sum W))).Q.Faithful \\
+  apply faithful_of_comp_faithful \\
+    (ImageCenterMorphismProperty Z (CatToDila (Z.sum W))).Q \\
+    (Localization.Construction.lift ... (ImageCenterMorphismProperty (Z.sum W) \\
+      (CatToDila (Z.sum W))).Q ...) \\
+  rw [Localization.Construction.fac] \\
+  exact CatToDila_isSigmaRegular (Z.sum W) \\
+\end{leancode}
+with a symmetric statement \lc{CatToDila_isSigmaRegular_sum_inr} for $W$. Both are instances
+of the same one-line categorical lemma from \S\ref{sec:sigma-regular},
+\lc{faithful_of_comp_faithful}: the localization at the $Z$-part alone factors, via
+\lc{Localization.Construction.lift}, through the localization at the full $Z\sqcup W$
+family (using the containment \lc{ImageCenterMorphismProperty_sum_inl_le} above to know
+every morphism the bigger localization needs to invert to make this factoring functor
+well-defined is already inverted), and the bigger localization is faithful by
+Fact~\ref{fact:theta-regular}. This is the same ``sub-family of a regular family is regular''
+pattern already used in \S\ref{sec:restriction}, now instantiated for
+the two halves of a disjoint union instead of for an arbitrary subset $K \subset I$.
+
+\subsubsection*{$\beta$: dilating $\calC_Z$ by the pushed-forward $W$}
+Pushing $W$ forward along $\Theta_Z : \calC \to \calC_Z := $\lc{Dila}$\ Z$ gives a center on
+$\calC_Z$ itself, and dilating $\calC_Z$ by it gives a functor $\beta$:
+\begin{leancode}
+def CenterZW (Z W : Center C) : Center (Dila Z) := W.pushforward (CatToDila Z) \\
+def Beta315 (Z W : Center C) : Dila Z ⥤ Dila (CenterZW Z W) := CatToDila (CenterZW Z W) \\
+\end{leancode}
+\lc{Center.pushforward} is the general-purpose operation transporting a center along an
+arbitrary functor (sieve $N_j \mapsto$ its pushforward \lc{Sieve.functorPushforward}$\ 
+(\Theta_Z)\ N_j$, already used for Proposition~\ref{prop:sieve-inclusion}); $\beta$ is then,
+verbatim, $\Theta$ for this pushed-forward center, i.e.\ nothing more than another instance of
+Definition~\ref{def:center}--\S\ref{sec:dilatation-construction}'s basic construction, applied
+one level up, inside $\calC_Z$ instead of inside $\calC$.
+
+\subsubsection*{$\Phi$: comparing $\calC_Z$ directly with $\calC_{Z\sqcup W}$}
+A comparison functor $\Phi : \calC_Z \to \calC_{Z\sqcup W}$ is produced next, not by
+invoking Proposition~\ref{prop:restriction}'s \lc{restrictPhi} (which would be the obvious
+route, $Z\sqcup W$ restricted to its $Z$-part being $Z$ again) but by a fresh application of
+Theorem~\ref{thm:universal-property} to $\Theta_{Z\sqcup W}$ itself:
+\begin{leancode}
+noncomputable def Phi315 (Z W : Center C) : Dila Z ⥤ Dila (Z.sum W) := \\
+  DilaLift Z (CatToDila (Z.sum W)) \\
+    (CatToDila_isSigmaRegular_sum_inl Z W) (CatToDila_sum_hsieve_inl Z W) \\[0.5\baselineskip]
+lemma Phi315_spec (Z W : Center C) : \\
+    CatToDila Z ⋙ Phi315 Z W = CatToDila (Z.sum W) := \\
+  DilaLift_fac Z (CatToDila (Z.sum W)) \\
+    (CatToDila_isSigmaRegular_sum_inl Z W) (CatToDila_sum_hsieve_inl Z W) \\
+\end{leancode}
+
+\subsubsection*{Regularity of $\Phi$}
+\begin{leancode}
+theorem Phi315_isSigmaRegular (Z W : Center C) : \\
+    IsSigmaRegular (CenterZW Z W) (Phi315 Z W) := by \\
+  show (ImageCenterMorphismProperty (CenterZW Z W) (Phi315 Z W)).Q.Faithful \\
+  rw [ImageCenterMorphismProperty_ZW_Phi_eq] \\
+  exact CatToDila_isSigmaRegular_sum_inr Z W \\
+\end{leancode}
+The single nontrivial ingredient is \lc{ImageCenterMorphismProperty_ZW_Phi_eq}, an
+extensionality lemma identifying the images of the \lc{CenterZW}-generators under $\Phi$
+with the images of the $W$-generators under $\Theta_{Z\sqcup W}$ directly (using
+\lc{Phi315_spec} to transport along the object-level identification $\Phi(\Theta_Z(X)) =
+\Theta_{Z\sqcup W}(X)$, with the \lc{eqToHom} bookkeeping this identification carries,
+exactly as in \S\ref{sec:universal-property-statement}); once the two image-classes of
+morphisms are known to coincide, regularity is exactly
+\lc{CatToDila_isSigmaRegular_sum_inr} from above.
+
+\subsubsection*{The comparison functor in the other direction, built first}
+The formalization builds a second comparison functor,
+$\alpha' : \calC_Z[$\lc{CenterZW}$] \to \calC_{Z\sqcup W}$, before it builds the one going the
+other way, and the source file's own comment explains why: the construction still to come
+will need this one's defining equation as an ingredient, so it is built first, and it needs
+nothing beyond the regularity of $\Phi$ just established:
+\begin{leancode}
+noncomputable def Alpha'315 (Z W : Center C) : Dila (CenterZW Z W) ⥤ Dila (Z.sum W) := \\
+  DilaLift (CenterZW Z W) (Phi315 Z W) \\
+    (Phi315_isSigmaRegular Z W) (Phi315_hsieve Z W) \\[0.5\baselineskip]
+theorem Alpha'315_spec (Z W : Center C) : \\
+    Beta315 Z W ⋙ Alpha'315 Z W = Phi315 Z W := \\
+  DilaLift_fac (CenterZW Z W) (Phi315 Z W) \\
+    (Phi315_isSigmaRegular Z W) (Phi315_hsieve Z W) \\
+\end{leancode}
+This is Theorem~\ref{thm:universal-property} applied a third time in this section alone (after
+the two applications already used for $\Phi$): to $\Phi$ itself, viewed as a functor out of
+$\calC_Z$'s \lc{CenterZW}-dilatation, using exactly the regularity and sieve-inclusion facts
+already in hand (\lc{Phi315_hsieve}, the pushforward-sieve inequality, is again
+Proposition~\ref{prop:sieve-inclusion} transported through \lc{Sieve.functorPushforward_comp},
+the same pattern as \citep[Fact~3.11]{Mayeux}).
+
+\subsubsection*{The delicate direction, and the hypothesis it needs}
+The comparison functor going the other way, $\alpha : \calC_{Z\sqcup W} \to
+\calC_Z[$\lc{CenterZW}$]$, is delicate. Its defining
+application of Theorem~\ref{thm:universal-property} needs $\Theta_Z\ggg\beta$ to be
+$\Sigma_{Z\sqcup W}$-regular, which the machinery built so far does not supply automatically;
+see \S\ref{sec:gap}. The formalization's response is to stop trying to derive it
+and instead take it as an explicit hypothesis, threaded through every following declaration
+by name:
+\begin{leancode}
+noncomputable def Alpha315 (Z W : Center C) \\
+    (hreg : IsSigmaRegular (Z.sum W) (CatToDila Z ⋙ Beta315 Z W)) : \\
+    Dila (Z.sum W) ⥤ Dila (CenterZW Z W) := \\
+  (Dila_universal_property (Z.sum W) (CatToDila Z ⋙ Beta315 Z W) \\
+      hreg (BetaComp315_hsieve Z W)).choose \\
+\end{leancode}
+where \lc{BetaComp315_hsieve} is the accompanying sieve-inclusion hypothesis.
+
+\subsubsection*{Assembling the isomorphism}
+With \lc{hreg} in hand, the remaining declarations are again routine, and again go through
+Theorem~\ref{thm:universal-property}'s uniqueness clause, now via a standalone helper,
+\lc{Dila_factor_unique}, recording exactly that clause for reuse (\S\ref{sec:universal-property-statement}), applied three times in succession. First, an auxiliary identity:
+\begin{leancode}
+theorem Phi315_comp_Alpha315 (Z W : Center C) \\
+    (hreg : IsSigmaRegular (Z.sum W) (CatToDila Z ⋙ Beta315 Z W)) : \\
+    Phi315 Z W ⋙ Alpha315 Z W hreg = Beta315 Z W := by \\
+  apply Dila_factor_unique Z (CatToDila Z ⋙ Beta315 Z W) \\
+    (Phi315 Z W ⋙ Alpha315 Z W hreg) (Beta315 Z W) \\
+  · rw [← Functor.assoc, Phi315_spec, Alpha315_spec] \\
+  · rfl \\
+  · exact IsSigmaRegular_sum_inl_of Z W (CatToDila Z ⋙ Beta315 Z W) hreg \\
+\end{leancode}
+(both $\Phi\ggg\alpha$ and $\beta$ agree after precomposing with $\Theta_Z$, so
+\lc{Dila_factor_unique} (fed the restriction of \lc{hreg} to the $Z$-part alone, via
+\lc{IsSigmaRegular_sum_inl_of}, the same restriction-of-regularity fact used throughout
+\S\ref{sec:combining-construction}) identifies them). From this single identity, two
+further identities follow by the same pattern, cancelling in the other two dilatations
+in turn:
+\begin{leancode}
+theorem Alpha315_comp_Alpha'315 (Z W : Center C) \\
+    (hreg : ...) : Alpha315 Z W hreg ⋙ Alpha'315 Z W = 𝟭 (Dila (Z.sum W)) := by \\
+  apply Dila_factor_unique (Z.sum W) (CatToDila (Z.sum W)) ... (𝟭 _) \\
+  · rw [← Functor.assoc, Alpha315_spec, Functor.assoc, Alpha'315_spec, Phi315_spec] \\
+  · exact Functor.comp_id _ \\
+  · exact CatToDila_isSigmaRegular (Z.sum W) \\[0.5\baselineskip]
+theorem Alpha'315_comp_Alpha315 (Z W : Center C) \\
+    (hreg : ...) : Alpha'315 Z W ⋙ Alpha315 Z W hreg = 𝟭 (Dila (CenterZW Z W)) := by \\
+  apply Dila_factor_unique (CenterZW Z W) (Beta315 Z W) ... (𝟭 _) \\
+  · rw [← Functor.assoc, Alpha'315_spec, Phi315_comp_Alpha315] \\
+  · exact Functor.comp_id _ \\
+  · exact CatToDila_isSigmaRegular (CenterZW Z W) \\
+\end{leancode}
+and finally, a pair of mutually inverse functors assembles into an isomorphism of \lc{Cat}:
+\begin{leancode}
+noncomputable def Iso315 (Z W : Center C) \\
+    (hreg : IsSigmaRegular (Z.sum W) (CatToDila Z ⋙ Beta315 Z W)) : \\
+    Cat.of (Dila (CenterZW Z W)) ≅ Cat.of (Dila (Z.sum W)) where \\
+  hom := Alpha'315 Z W \\
+  inv := Alpha315 Z W hreg \\
+  hom_inv_id := Alpha'315_comp_Alpha315 Z W hreg \\
+  inv_hom_id := Alpha315_comp_Alpha'315 Z W hreg \\
+\end{leancode}
+needing only the two composite identities just proved, not the fuller coherence data of a
+\lc{CategoryTheory.Equivalence}.
+
+\subsection{Comparison with the printed paper}
+\label{sec:gap}
+
+Having built \lc{Center.sum}, $\Phi$, $\beta$, \lc{Alpha'315}, \lc{Alpha315}, and
+\lc{Iso315} in the order above, we can now state what the original paper claims these
+declarations formalize, and compare.
+
+The statement to be examined is \citep[Proposition~3.15]{Mayeux}:
+\begin{quote}
+With $\calC_Z := \calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}]$,
+$\calC_{I'} := \calC[\{(d_k)^{-1}\circ N_k\}_{k\in I'}]$ for $I' = I\sqcup J$, and
+$\calC_Z[\{\Theta_Z(d_j)^{-1}\circ\Theta_Z(N_j)\}_{j\in J}]$ the dilatation of $\calC_Z$ by the
+pushed-forward $W$:
+\begin{enumerate}
+\item[(1)] $\Phi$ is $\{\Theta_Z(d_j)\}_{j\in J}$-regular;
+\item[(2)] $\Theta_Z \ggg \beta$ is $\{d_k\}_{k\in I'}$-regular;
+\item[(3)] there is a unique $\alpha : \calC_{I'} \to \calC_Z[\{\Theta_Z(d_j)^{-1}\circ
+  \Theta_Z(N_j)\}_{j\in J}]$ with $\Theta_Z \ggg \beta = \Theta_{I'} \ggg \alpha$;
+\item[(4)] there is a unique
+  $\alpha' : \calC_Z[\{\Theta_Z(d_j)^{-1}\circ \Theta_Z(N_j)\}_{j\in J}] \to \calC_{I'}$ with
+  $\Phi = \beta \ggg \alpha'$;
+\item[(5)] $\alpha \ggg \alpha' = \id$ and $\alpha' \ggg \alpha = \id$;
+\item[(6)] hence $\calC_Z[\{\Theta_Z(d_j)^{-1}\circ \Theta_Z(N_j)\}_{j\in J}] \cong \calC_{I'}$.
+\end{enumerate}
+\end{quote}
+As shown below, part~(2)'s printed proof is not rigorous and is not formalized
+unconditionally here; parts~(3), (5), (6), which are built on it, are correspondingly not
+rigorously established unconditionally as printed either.
+
+Informally, this says: dilating twice, first by $Z$ and then by (the pushforward of) $W$,
+gives the same category as dilating once by the union of $Z$ and $W$, an
+associativity-of-dilatation statement, and the fact that lets one build up a dilatation by a
+large, complicated center incrementally, one piece at a time.
+
+Parts (1) and (4) match the construction of \S\ref{sec:combining-construction} exactly and
+unconditionally: (1) is \lc{Phi315_isSigmaRegular}; (4) is \lc{Alpha'315} together with
+\lc{Alpha'315_spec} and \lc{Alpha'315_unique}. Parts (3), (5), (6) match the construction too,
+but only conditionally, since $\alpha$ itself already needs part~(2)'s regularity to be
+built at all: (3) is \lc{Alpha315} together with \lc{Alpha315_spec} and \lc{Alpha315_unique},
+each taking \lc{hreg} as an explicit argument; (5) is \lc{Alpha315_comp_Alpha'315} and
+\lc{Alpha'315_comp_Alpha315}, both stated for an arbitrary \lc{hreg}; (6) is \lc{Iso315},
+likewise. In other words, item~(2) is not merely ``the part where the two accounts part
+ways'' in isolation; it is a hypothesis that then propagates through every part built on
+top of $\alpha$, i.e.\ through (3), (5), and (6) as well.
+
+\subsubsection*{Part (2) of \citep[Proposition~3.15]{Mayeux} is not fully justified}
+
+The printed proof says applying \citep[Fact~2.14]{Mayeux} twice suffices to prove part~(2);
+that sufficiency is not clear, and no justification for it appears in the source material. We
+do not know whether part~(2) itself, as stated in \citep{Mayeux}, is true in full generality,
+only that this proof does not establish it in full generality.
+
+\begin{remark}
+\label{rem:hreg-honest}
+Concretely, the formalization proves parts (1) and (4) unconditionally, but parts (2), (3),
+(5), (6) only conditionally on the extra hypothesis \lc{hreg}.
+\end{remark}
+
+\subsection{A parallel construction without the gap: combining sieves}
+
+A close relative of the construction above combines, on the same family of morphisms
+$\{d_i\}_{i\in I}$, two different choices of sieves rather than two different centers, and here
+the formalization proves the analogous regularity unconditionally.
+
+\subsubsection*{The Lean construction}
+For each $i \in I$, let $N_i'$ be another sieve over $\cod(d_i)$, and $N_i'' := N_i\cup N_i'$
+their union (\lc{Center.sieveUnion}); let \lc{Center.altSieve} denote the center on $\calC_Z$
+obtained by pushing forward $N_i'$ (rather than $N_i$) along $\Theta_Z$. The two comparison
+functors are built exactly as \lc{Alpha315} and \lc{Alpha'315} were, via
+Theorem~\ref{thm:universal-property}, applied once in each direction, and recorded as
+\lc{Alpha318} and \lc{Alpha'318}, with \lc{Iso318} assembling them into an isomorphism of
+categories, mirroring \lc{Iso315} verbatim.
+
+\subsubsection*{Comparison with the printed paper}
+\begin{proposition}[{\citep[Proposition~3.18]{Mayeux}}]
+\label{prop:sieve-union}
+With notation as above, $\calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}, \{(d_i)^{-1}\circ
+N_i'\}_{i\in I}]$ (dilating once by $N_i$, then again by the pushforward of $N_i'$) is
+canonically isomorphic to $\calC[\{(d_i)^{-1}\circ N_i''\}_{i\in I}]$.
+\end{proposition}
+Unlike \citep[Proposition~3.15]{Mayeux}, every part of this statement (including the
+analogue of part~(2)) is proved unconditionally in the formalization, with no \lc{hreg}-style
+hypothesis anywhere in \lc{Alpha318}, \lc{Alpha'318}, or \lc{Iso318}. The reason is structural,
+and it isolates precisely what made \S\ref{sec:gap} delicate: here both sides invert exactly
+the same collection of morphisms $\{d_i\}_{i\in I}$, only the sieves differ, so the
+problematic step of \S\ref{sec:gap}, comparing localizations at two different,
+growing collections of inverted morphisms, never arises; the relevant regularity is
+inherited directly from Fact~\ref{fact:theta-regular} with no enlargement of $\Sigma$ to
+account for. This confirms that the difficulty isolated in Remark~\ref{rem:hreg-honest} is
+specifically about enlarging the family of inverted morphisms, not about combining two
+pieces of data on $\calC$ as such.
+
+\section{Codilatations}
+\label{sec:codilatations}
+
+Everything so far dilates along morphisms $d_i : \dom(d_i) \to \cod(d_i)$ using
+sieves $N_i$ over $\cod(d_i)$ (collections closed under precomposition), forcing
+morphisms into $\cod(d_i)$ to factor through $d_i$. There is an evidently dual
+construction, forcing morphisms out of $\dom(d_i)$ to factor through $d_i$, using
+cosieves (collections of morphisms out of a fixed object, closed under
+postcomposition) in place of sieves.
+
+Rather than developing this dual theory from scratch (repeating every definition,
+lemma, and proof of \S\ref{sec:centers}--\S\ref{sec:universal-property} with arrows reversed),
+the formalization derives it for free, by definitional transport across the
+opposite-category duality $\calC \leftrightsquigarrow \calC^{\op}$.
+
+\begin{fact}
+A cosieve from an object $X$ of $\calC$ is the same data as a sieve over $X$, regarded as an
+object of $\calC^{\op}$.
+\end{fact}
+
+In Lean this identification is recorded as an explicit \lc{Equiv} (\lc{Cosieve.equivSieveOp}),
+not merely as a pair of maps going back and forth: a \lcode{Cosieve X} is a structure of
+identical shape to \lc{Sieve}, and the equivalence simply reindexes the closure condition
+along $\op$.
+
+\begin{definition}[{\citep[Definition~4.1]{Mayeux}}]
+A cocenter in $\calC$ is a family $\{(d_i,V_i)\}_{i\in I}$ with $d_i$ a morphism and
+$V_i$ a cosieve from $\dom(d_i)$.
+\end{definition}
+Given the identification above, a cocenter in $\calC$ is a center in $\calC^{\op}$
+(with $d_i$ replaced by its formal opposite $d_i^{\op} : \cod(d_i) \to \dom(d_i)$, now going
+the right way to serve as a center morphism in $\calC^{\op}$); Lean's
+\lc{Cocenter.toCenterOp} records exactly this re-casting, and no new \lc{structure} for
+``cocenter data attached to $\calC$ itself'' beyond the re-casting is introduced.
+
+\begin{definition}[{\citep[Definition~4.3]{Mayeux}}]
+The codilatation of $\calC$ with cocenter $\{(d_i,V_i)\}_{i\in I}$ is
+$\calC[\{V_i\circ(d_i)^{-1}\}_{i\in I}] := \big(\calC^{\op}[\{(d_i)^{-1}\circ
+V_i\}_{i\in I}]\big)^{\op}$.
+\end{definition}
+
+\begin{leancode}
+def Codila (co : Cocenter C) : Type u := (Dila (co.toCenterOp))ᵒᵖ \\
+\end{leancode}
+This one line is the whole construction: dilate $\calC^{\op}$ by the corresponding
+center, then take the opposite category again to land back in (a category built from)
+$\calC$. Every structural fact then transports along the same route, with no new proof
+content:
+
+\begin{proposition}[{\citep[Proposition~4.5]{Mayeux}}]
+There is a canonical functor $\Upsilon : \calC \to \calC[\{V_i\circ(d_i)^{-1}\}_{i\in I}]$,
+a canonical faithful functor from the codilatation to $\calC[\{d_i\}_{i\in I}^{-1}]$,
+$\Upsilon$ is $\{d_i\}_{i\in I}$-regular, and $\Upsilon$ represents the appropriately dualized
+functor $Cat_\calC^{\{d_i\}_{i\in I}\text{-reg}} \to \mathrm{Set}$.
+\end{proposition}
+
+In Lean, $\Upsilon$ is \lcode{Cocenter.Upsilon co}, built as \lcode{(CatToDila
+co.toCenterOp).rightOp} (Mathlib's operation turning a functor $\calC^{\op} \to \calD$ into a
+functor $\calC \to \calD^{\op}$); the faithful comparison functor is
+\lc{Codila.faithful_to_loc_op}, an instance derived directly from
+Fact~\ref{fact:faithful-into-localization} applied in $\calC^{\op}$; $\Sigma$-regularity of
+$\Upsilon$ is \lc{Cocenter.Upsilon_isSigmaRegular}, from Fact~\ref{fact:theta-regular}
+transported across $\op$ (using, once more,
+\lc{faithful_of_comp_faithful} to relate faithfulness of a functor and of its
+\lc{.op}); and representability is \lc{Cocenter.represents}, from
+\citep[Proposition~3.12]{Mayeux} transported across $\op$, combined with the sieve/cosieve identification
+above. Not a single one of these four proofs contains an argument that is not already present,
+in dual form, in \S\ref{sec:theta-properties}--\S\ref{sec:universal-property-statement}; the
+work is entirely in setting up the \op-translation once, correctly, and then invoking it four
+times.
+\section{Comparison with dilatations of rings}
+\label{sec:rings}
+
+The construction that motivated this whole theory, dilatations of a commutative ring $A$
+at a multi-center $\{(M_i,a_i)\}_{i\in I}$ of ideals and elements, should be a special case
+of dilatations of categories. We present the formalization's own construction first, in the
+order the source builds it, and only afterward state the printed paper's Proposition~5.1 and
+compare the two: as with \citep[Proposition~3.15]{Mayeux} above, the comparison is easiest to
+see
+once the construction is already on the table.
+
+\subsection{The construction, following the formalization}
+\label{sec:rings-construction}
+
+\subsubsection*{The vendored ring dilatation}
+The ring $A[M]$ itself is not developed inside the file discussed in this paper: it is
+vendored, essentially verbatim, from the Lean formalization of multi-centered dilatations of
+rings~\citep{MZ}, accompanying the separate paper introducing the construction
+mathematically~\citep{M}. A multi-center is a triple of an index type and
+two functions:
+\begin{leancode}
+structure Multicenter (A' : Type*) [CommSemiring A'] where \\
+  index : Type* \\
+  ideal : index → Ideal A' \\
+  elem : index → A' \\
+\end{leancode}
+Writing $L_i := M_i+(a_i)$ for the associated \emph{large ideal} (\lc{LargeIdeal}), and, for
+a finitely-supported exponent tuple $\nu \in \mathbb N^{(I)}$ (Lean notation $M^{\mathbb N}$
+for \lcode{index →₀ ℕ}), $a^\nu := \prod_i a_i^{\nu_i}$ and $L^\nu := \prod_i L_i^{\nu_i}$
+(\lc{familyPow}, \lc{prodLargeIdealPower}), a general element of $A[M]$ is a pair
+$(\nu,m)$ with $m \in L^\nu$ (\lc{PreDil}), modulo the equivalence
+$(\nu,m)\sim(\nu',m')$ iff $m\cdot a^{\nu'+\beta} = m'\cdot a^{\nu+\beta}$ for some
+$\beta\in\mathbb N^{(I)}$ (\lc{Multicenter.r}); $A[M]$ (\lc{Multicenter.Dilatation}) is the
+resulting quotient. This is a deliberate scope decision: re-deriving the ring-theoretic
+theory here would duplicate an existing, independently-developed formalization, and the only
+new content needed for this paper is the comparison with dilatations of categories,
+described next.
+
+\subsubsection*{The index type $M^{\mathbb N}$}
+\begin{leancode}
+def centerOfMulticenter (M : Multicenter A') : Center (CategoryTheory.SingleObj A') where \\
+  I := M^ℕ \\
+  nonempty := ⟨0⟩ \\
+  dom _ := CategoryTheory.SingleObj.star A' \\
+  cod _ := CategoryTheory.SingleObj.star A' \\
+  mor ν := M.elem^ν \\
+  N ν := Sieve.ofIdeal (M.LargeIdeal^ν) \\
+\end{leancode}
+The index type of this center is $M^{\mathbb N} = \mathbb N^{(I)}$, the same exponent
+profiles indexing $A[M]$'s elements above --- \emph{not} $M.\mathrm{index} = I$: the generator at
+$\nu$ divides by $a^\nu$, with numerator ranging over all of $L^\nu$.
+
+\subsubsection*{The universal-property half}
+Feeding the canonical ring map $A \to A[M]$ through \lc{SingleObj} gives
+\lc{toDilatationFunctor}$: $\lc{SingleObj}$\,A \to $\lc{SingleObj}$\,A[M]$, the functor
+playing the role of $F$ in Theorem~\ref{thm:universal-property}. \lc{prop_5_1} applies that
+theorem to it directly: the sieve inequality is a direct computation (an element of the image
+of $L^\nu$ already factors through $a^\nu$, by definition of $L^\nu$), and $\Sigma$-regularity
+is built by composing with the further localization of $A[M]$ at the submonoid generated by
+the images of the $a_i$'s --- faithful because those images are non-zero-divisors in $A[M]$
+(\lc{nonzerodiv_image_single}, an unconditional structural fact about the vendored
+construction), so this further localization is injective. This gives
+\begin{leancode}
+noncomputable def Phi51 : Dila (centerOfMulticenter M) ⥤ CategoryTheory.SingleObj A'[M] := \\
+  (prop_5_1 M).choose \\
+\end{leancode}
+together with \lc{Phi51_spec} and \lc{Phi51_unique}, exactly as \lc{Alpha315} was extracted
+from \lc{Dila_universal_property} in \S\ref{sec:combining-construction}.
+
+\subsubsection*{Faithfulness, via a commutativity argument}
+Theorem~\ref{thm:universal-property} only guarantees $\Phi=$\lc{Phi51} exists; showing it is
+an isomorphism is separate work. Faithfulness goes through a second comparison functor,
+\lc{kappaFunctor}$: $\lc{SingleObj}$\,A[M] \to $ the raw localization of
+\lc{centerOfMulticenter}$\,M$, built from a monoid map \lc{LocEndLift} extending
+\lc{toLocEnd}$: A \to $\lc{End}$(\bullet)$ along the localization $A \to A[M]$. Building
+\lc{LocEndLift} needs the target monoid to be commutative, which is not automatic --- it is
+established by \lc{allCentral}: every endomorphism of the raw localization's single object
+commutes with every other morphism, proved by showing the relevant \lc{MorphismProperty} is
+stable under composition, contains every generator-image (central because $A$ is
+commutative, \lc{genImage\_central}), and contains every formal inverse (a central element's
+inverse is central), hence is everything
+(\lc{Localization.Construction.morphismProperty\_is\_top}). With commutativity in hand,
+\lc{Phi51}$\ggg$\lc{kappaFunctor} is identified with the (unconditionally faithful, Fact~2.14)
+\lc{DilaToLoc} of \lc{centerOfMulticenter}$\,M$ by \lc{Dila\_factor\_unique}, and
+\lc{faithful\_of\_comp\_faithful} gives \lc{Phi51\_faithful}.
+
+\subsubsection*{Fullness, for free from the indexing}
+Fullness needs none of this machinery. Since the center is indexed by exponent profiles,
+every element of $A[M]$ is \emph{directly} a pair $(\nu,m)$ by
+\lc{Multicenter.Dilatation.induction\_on}, hence directly the image of the single fraction
+generator at $(\nu,m)$, using the defining identity $a^\nu\cdot(m/a^\nu)=m$ inside $A[M]$
+itself (\lc{algebraMap\_elem\_pow\_mul\_frac}). No induction on composites is needed, unlike
+the fullness arguments of \S\ref{sec:restriction} and \S\ref{sec:counterexample}.
+
+\subsubsection*{Assembling the isomorphism}
+With \lc{Phi51} full and faithful, an explicit inverse \lc{Psi51} is built directly (rather
+than invoked from a general full-faithful-essentially-surjective equivalence principle, since
+both categories here have a single object, so $\Phi$ is precisely a bijective monoid
+homomorphism and its set-theoretic inverse is again one), and
+\begin{leancode}
+noncomputable def Iso51 : Cat.of (Dila (centerOfMulticenter M)) ≅ \\
+    Cat.of (CategoryTheory.SingleObj A'[M]) where \\
+  hom := Phi51 M \\
+  inv := Psi51 M \\
+  hom_inv_id := Phi51_comp_Psi51 M \\
+  inv_hom_id := Psi51_comp_Phi51 M \\
+\end{leancode}
+assembles the two composite-identity theorems \lc{Phi51\_comp\_Psi51}/\lc{Psi51\_comp\_Phi51}
+into an isomorphism of categories, matching the pattern of \lc{Iso315} in
+\S\ref{sec:combining-construction} exactly.
+
+The identification above assembles into a single chain together with one further fact, purely
+ring-theoretic and proved independently of categories: reindexing the multi-center by exponent
+profiles and dilating again recovers the same ring.
+
+\begin{theorem}
+\label{thm:rings-reindex}
+Let $\{[M_i,a_i]\}_{i\in I}$ be a multi-center on $A$, with large ideals $L_i = M_i+(a_i)$, and
+for $\nu\in\mathbb N^{(I)}$ write $L^\nu := \prod_i L_i^{\nu_i}$, $a^\nu := \prod_i a_i^{\nu_i}$.
+Then
+\[
+\calC\big[\{(a^\nu)^{-1}\circ L^\nu\}_{\nu\in\mathbb N^{(I)}}\big] \;\cong\;
+A\big[\{L^\nu/a^\nu\}_{\nu\in\mathbb N^{(I)}}\big] \;\cong\; A\big[\{M_i/a_i\}_{i\in I}\big] = A[M],
+\]
+where $\calC$ is the one-object category attached to $A$.
+\end{theorem}
+
+The first isomorphism is \lc{Iso51} above: the categorical dilatation by the $\nu$-indexed
+center \lc{centerOfMulticenter}$\,M$ is isomorphic to $A[M]$ itself. The second is
+\lc{Multicenter.Dilatation.reindexRingEquiv}: dilating $A$ by the $\nu$-indexed multi-center
+$\{[L^\nu,a^\nu]\}_{\nu\in\mathbb N^{(I)}}$ (\lc{Multicenter.reindex}$\,M$) recovers $A[M]$ up to
+isomorphism, via the flattening map $\mu\mapsto\sum_\nu \mu(\nu)\cdot\nu$ sending the reindexed
+ring's own exponent profiles back down to $M$'s. Together, the two say that all three
+constructions --- the category built from $\nu$-indexed generators, the original ring
+dilatation, and the ring dilatation of the $\nu$-indexed reindexing --- coincide.
+
+\subsection{Comparison with the printed paper}
+\label{sec:rings-gap}
+
+With the multi-center $\{[M_i,a_i]\}_{i\in I}$ as above, \citep[Proposition~5.1]{Mayeux}
+asserts an identification, as $\calC$-categories, of $\calC[\{(a_i)^{-1}\circ M_i\}_{i\in I}]$
+(dilating by the center indexed directly by $i\in I$) with the category attached to $A[M]$.
+This identification does not hold.
+
+The printed proof's comparison functor $\Phi$ sends a fraction generator to $m/a_i$ and is
+claimed surjective. It is not: composition in \lc{SingleObj}$\,A$ is multiplication, so the
+image of every morphism is a product $c\cdot\prod_j(m_j/a_{i_j})$, and not every element of
+$A[M]$ has this multiplicative form --- for instance, with $A=\mathbb Z[X]$, $a=2$, $M=(X)$,
+every product of elements of $M$ stays divisible by $X$, but $(X+2)/2 \in A[M]$ does not.
+Moreover no $\calC$-functor can fix this: \lc{toDilatationFunctor} satisfies both hypotheses
+of Theorem~\ref{thm:universal-property} for the $I$-indexed center too, so by uniqueness
+$\Phi$ is the \emph{only} candidate, and it is not an isomorphism.
+
+This argument is formalized in full: \lc{centerNaive} is the naive $I$-indexed center,
+\lc{PhiNaive} the comparison functor built from Theorem~\ref{thm:universal-property}'s
+existence clause, \lc{target_elt_not_in_range} proves $(X+2)/2$ is unreachable, and
+\lc{no_C_compatible_equiv} concludes that no functor compatible with the two canonical
+inclusion functors is an equivalence.
+
+The structural reason is additive closure: $A[M]$'s numerators range over $L^\nu$, a sum of
+products of single-ideal elements, but composition alone only ever produces products. The
+formalization's \lc{centerOfMulticenter} (\S\ref{sec:rings-construction}) repairs this by
+moving the needed sums into the sieves themselves ($L^\nu$ as a single sieve, rather than
+$M_i$ generator by generator); with that center, the identification holds
+(Theorem~\ref{thm:rings-reindex} above).
+
+\section{A characterization that fails for categories}
+\label{sec:counterexample}
+
+This section formalizes \citep[Fact~5.2]{Mayeux}, as Theorem~\ref{thm:no-realizing-center}.
+
+\subsection{The ring-theoretic fact being tested}
+
+For dilatations of commutative rings, every sub-$A$-algebra of a localization
+$A[(\{a_i\}_{i\in I})^{-1}]$ arises as $A[\{M_i/a_i\}]$ for a suitable multi-center.
+Theorem~\ref{thm:no-realizing-center} shows, by an explicit finite counterexample, that the
+analogous statement fails for dilatations of categories.
+
+\subsection{The counterexample category}
+
+Let $\calC$ have two objects $X,Y$, with $\Hom(X,X) = \{\id_X\}$, $\Hom(Y,Y)=\{\id_Y\}$,
+$\Hom(Y,X) = \varnothing$, and $\Hom(X,Y) = \{a,b\}$ two distinct, non-identity, parallel
+morphisms; let $\Gamma = \{b\}$.
+
+\begin{leancode}
+inductive Obj : Type \\
+  | X | Y \\[0.5\baselineskip]
+inductive CHom : Obj → Obj → Type \\
+  | idX : CHom .X .X \\
+  | idY : CHom .Y .Y \\
+  | a : CHom .X .Y \\
+  | b : CHom .X .Y \\
+\end{leancode}
+Composition is a four-line pattern match, and associativity holds by \lcode{cases ...
+<;> rfl} over the finitely many cases.
+
+Localizing at $\Gamma=\{b\}$ produces infinitely many morphisms $X \to Y$: $b, a,
+ab^{-1}a, \dots$ In Lean, the pairwise distinctness of the first three is proved with a
+separating invariant: a functor \lc{FSep} to the one-object groupoid on $(\mathbb Z,+)$
+(Mathlib's \lcode{SingleObj (Multiplicative ℤ)}), sending $a \mapsto 1$ and $b\mapsto 0$.
+The target being a groupoid, \lc{FSep} inverts $\Gamma$ trivially, hence extends to
+$\calC[\Gamma^{-1}]$ by the universal property of localization (\S\ref{sec:localization});
+the resulting integer is additive along composition and takes the values $0,1,2$ on
+$b, a, ab^{-1}a$ (\lc{pairwise_distinct}).
+
+Now let $\calD$ be the subcategory of $\calC[\Gamma^{-1}]$ with the same objects, with
+$\Hom_\calD(Y,X)=\varnothing$, $\Hom_\calD(X,X)=\{\id_X\}$, $\Hom_\calD(Y,Y)=\{\id_Y\}$, and
+$\Hom_\calD(X,Y) = \{b,a,ab^{-1}a\}$. The evident functors $\calC \to \calD$ and
+$\calD \to \calC[\Gamma^{-1}]$ (the inclusion) compose to the localization functor.
+
+\begin{theorem}[{\citep[Fact~5.2]{Mayeux}}]
+\label{thm:no-realizing-center}
+$\calD \to \calC[\Gamma^{-1}]$ is faithful, but $\calD$ is not isomorphic, as a
+$\calC$-category, to $\calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}]$ for any center
+$\{(d_i,N_i)\}_{i\in I}$ on $\calC$.
+\end{theorem}
+
+Faithfulness of $\calD \to \calC[\Gamma^{-1}]$ is immediate, $\calD$ being literally a
+subcategory. The content is the second half.
+
+\subsection{The case analysis}
+
+The proof considers an arbitrary center $\{(d_i,N_i)\}_{i\in I}$ on $\calC$, writes
+$\Sigma=\{d_i\}_{i\in I}$, and distinguishes two cases: either (i) $a \in \Sigma$ with
+$\id_Y \in N_a$ or $b \in N_a$ (or symmetrically for $b$), in which case
+$\#\Hom_{\calC'}(X,Y)$ is infinite; or (ii) whenever $a \in \Sigma$ then $N_a \subset \{a\}$,
+and whenever $b\in\Sigma$ then $N_b \subset\{b\}$, in which case $\calC' = \calC$. In both
+cases $\calC' \neq \calD$. In Lean, the dichotomy is expressed by a single predicate, with
+case~(i) as its negation.
+
+\begin{leancode}
+def GoodCenter (Z : Center Obj) : Prop := \\
+  ∀ (i : Z.I) (X' : Obj) (m : X' ⟶ Z.cod i), Z.N i m → ∃ q : X' ⟶ Z.dom i, m = q ≫ Z.mor i \\
+\end{leancode}
+That is: $Z$ is good if every sieve witness factors through its own generator; a case
+analysis on the finitely many shapes of generators (\lc{Center.dom_cod_cases}) shows this
+is equivalent, for a center on $\calC$, to case~(ii).
+
+\subsubsection{If $Z$ is not good}
+
+Suppose some witness $m \in N_i$ does not factor through $d_i$. Case-splitting on the shape
+of $d_i$ (\lc{Center.dom_cod_cases}):
+\begin{itemize}
+\item if $d_i : X\to X$ or $d_i:Y\to Y$, then $d_i = \id$, through which everything factors,
+  contradicting the choice of $m$ (\lc{false_of_hnq_selfmor});
+\item if $d_i : X \to Y$, a further case split on $m$ shows that the fraction morphism of
+  Proposition~\ref{prop:fraction-exists} for $(i,m)$ is a non-identity endomorphism of $X$
+  or a morphism $Y \to X$ in $\calC'$, and $\calD$ has neither (\lc{false_of_hnq_case3}).
+\end{itemize}
+In Lean, case~(i)'s obstruction is thus exhibited as a single explicit morphism that cannot
+exist in $\calD$ under any isomorphism $\calC' \cong \calD$ compatible with the maps from
+$\calC$.
+
+\subsubsection{If $Z$ is good}
+
+Suppose $Z$ is good. Lemma~\ref{lem:induction} then shows every morphism of $\calC'$ is
+$\Theta$ of a morphism of $\calC$: on a fraction generator $(i,n)$, goodness gives
+$n = q \circ d_i$, and cancelling the epimorphism $\Theta(d_i)$
+(\citep[Proposition~3.3]{Mayeux}) in the defining triangle forces $b = \Theta(q)$. This
+gives \lc{CatToDila_full_of_good}: $\Theta$ is full, and faithful here, so
+$\calC' \cong \calC$ as $\calC$-categories; since $\calC$ has two morphisms $X \to Y$ and
+$\calD$ has three, $\calC' \not\cong \calD$.
+
+\subsection{Assembling the theorem}
+
+\begin{leancode}
+theorem no_realizing_center : \\
+    ¬ ∃ (Z : Center Obj) (e : DObj ≌ Dila Z), CtoD ⋙ e.functor = CatToDila Z \\
+\end{leancode}
+Given a hypothetical center $Z$ and equivalence $e$ realizing $\calD$ as \lc{Dila}$\,Z$
+compatibly with the maps from $\calC$, \lc{no_realizing_center} case-splits on
+\lc{GoodCenter}: if $Z$ is not good, the impossible morphism of the first case transports
+across $e$ to a contradiction; if $Z$ is good, the second case produces an injective
+comparison $\psi : \Hom_\calD(X,Y) \to \Hom_{\calC'}(X,Y)$ under which the three generators
+$b,a,c$ of $\calD$ (with $c$ standing for $ab^{-1}a$) all land in the two-element set
+$\{\Theta(a),\Theta(b)\}$, forcing a collision that contradicts \lc{pairwise_distinct}.
+
+\appendix
+\section{Dictionary between the mathematics and the Lean formalization}
+\label{app:dictionary}
+
+This appendix tabulates, for each numbered statement of the original exposition of
+dilatations of categories, the Lean declaration(s) that play its role
+(\S\ref{sec:dict-notation}--\S\ref{sec:dict-5}); the few statements that are not formalized
+are marked ``---'', with the reason in the Comments column.
+
+\subsection{Notation dictionary}
+\label{sec:dict-notation}
+
+\begingroup
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{@{}p{2.3cm}p{3.9cm}p{5.1cm}@{}}
+\toprule
+\textbf{Mathematics} & \textbf{Lean} & \textbf{Comments} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Mathematics} & \textbf{Lean} & \textbf{Comments} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+$\calC$, $\calD$ & \lc{C}, \lc{D} & \lcode{{C : Type u} [Category.{v} C]}. \\
+$X \xrightarrow{a} Y$ & \lcode{a : X }\ensuremath{\longrightarrow}\lcode{ Y} & \ensuremath{\longrightarrow} is Mathlib's hom-notation. \\
+$g \circ f$ & \lcode{f }\ensuremath{\gg}\lcode{ g} & diagrammatic order, see \S\ref{sec:conventions}. \\
+$\id_X$ & \lcode{𝟙 X} & \\
+sieve over $X$ & \lcode{Sieve X} & Mathlib type, reused as is. \\
+cosieve from $X$ & \lcode{Cosieve X} & introduced for this project, \S\ref{sec:dict-4}. \\
+$S^{\calC}_E$ & \lc{Sieve.generate} (applied to a \lc{Presieve}) & e.g.\ \lcode{Sieve.generate (Presieve.singleton g)} for $E=\{g\}$. \\
+$CoS^{\calC}_E$ & \lc{Cosieve.generate} & \\
+$\{[N_i,d_i]\}_{i\in I}$ (\citep[Definition~2.9]{Mayeux}) & \lcode{Center C} & structure, \S\ref{sec:dict-2}. \\
+$\{[V_i,d_i]\}_{i\in I}$ & \lcode{Cocenter C} & structure, \S\ref{sec:dict-4}. \\
+$\calC[\Sigma^{-1}]$ & \lcode{(Center\allowbreak MorphismProperty Z).\allowbreak Localization} & Mathlib's \lc{MorphismProperty.Localization}. \\
+$L : \calC \to \calC[\Sigma^{-1}]$ & \lcode{LocalizationFunctor Z} & \lcode{= (CenterMorphismProperty Z).Q}. \\
+$\calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}]$ & \lcode{Dila Z} & \S\ref{sec:dict-2}. \\
+$\calC[\{V_i \circ (d_i)^{-1}\}_{i\in I}]$ & \lcode{Codila co} & \S\ref{sec:dict-4}. \\
+$\Theta : \calC \to \calC'$ & \lcode{CatToDila Z} & \\
+$\Upsilon : \calC \to \calC[\{V_i\circ(d_i)^{-1}\}]$ & \lcode{Cocenter.Upsilon co} & \\
+$F'$ (\citep[Theorem~3.10]{Mayeux}) & \lcode{DilaLift Z F hfaith hsieve} & the unique functor with $F' \circ \Theta = F$; defining equation \lc{DilaLift_fac}, uniqueness \lc{DilaLift_unique} (\S\ref{sec:universal-property}). \\
+$b = d_i \backslash n = (d_i)^{-1}\circ n$ & \lcode{fraction\allowbreak_in_dila\allowbreak_single Z }\ensuremath{\langle}\lcode{i, }\ensuremath{\langle}\lcode{_, }\ensuremath{\langle}\lcode{n, hn}\ensuremath{\rangle}\ensuremath{\rangle}\ensuremath{\rangle} & the witness of Proposition~\ref{prop:fraction-exists}. \\
+$n \circ \ell_{d_i}$ (representative of $b$) & \lcode{fraction\allowbreak_in_path\allowbreak_single Z p}, \lcode{fraction\allowbreak_in_loc\allowbreak_single Z p} & the path in \lcode{Paths (LocQuiver }\ensuremath{\Sigma}\lcode{)}, resp.\ its class in $\calC[\Sigma^{-1}]$; \lcode{inv\allowbreak_in\allowbreak_path Z p} is the $\ell_{d_i}$ factor (Mathlib's \ensuremath{\psi_2}), see \S\ref{def:pair-fraction}. \\
+$Cat_\calC^{\Sigma\text{-reg}}$, membership & \lcode{IsSigmaRegular Z F} & a \lc{Prop}, not a category; see \S\ref{sec:sigma-regular}. \\
+$S^{\calC'}_{\Theta(N_i)}$, $S^{\calC'}_{\Theta(d_i)}$ & \lcode{CatToDilaSieve Z (Z.N i)}, \lcode{Sieve.generate (Presieve.singleton ((CatToDila Z).map (Z.mor i)))} & \citep[Definition~3.4]{Mayeux} is not given its own name; the two sieves are written out at each use. \\
+$A[\{M_i/a_i\}_{i\in I}]$ (ring dilatation) & \lc{A'[M]} (notation for \lc{Multicenter.Dilatation}) & \S\ref{sec:dict-5}. \\
+bimorphism & \lcode{Mono f }\ensuremath{\wedge}\lcode{ Epi f} & no dedicated ``Bimorphism'' class; spelled out. \\
+\end{longtable}
+\endgroup
+
+\subsection{Section 2: sieves, localizations, centers, and dilatations}
+\label{sec:dict-2}
+
+As explained in \S\ref{sec:localization}, Definitions~2.1--2.8 (sieves, the graph, $\Sigma$-sequences
+and their equivalence, $\Sigma$-fractions, the localization, and its universal property) are
+formalized by reusing Mathlib's calculus-of-fractions localization rather than by
+reformalizing the graph-theoretic argument of \S\ref{sec:localization} verbatim; the table below
+records, for each paper statement, which Mathlib declaration plays its role. From
+\citep[Definition~2.9]{Mayeux} on, every declaration listed is specific to this project.
+
+\begingroup
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{@{}p{2.55cm}p{4.1cm}p{4.75cm}@{}}
+\toprule
+\textbf{Mathematics} & \textbf{Lean declaration} & \textbf{Comments} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Mathematics} & \textbf{Lean declaration} & \textbf{Comments} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\citep[Definition~2.1]{Mayeux} (sieve, $S^\calC_E$) & \lc{Sieve}, \lc{Sieve.generate}, \lc{Cosieve}, \lc{Cosieve.generate} & Mathlib's \lc{Sieve}; \lc{Cosieve} is introduced for this project (\S\ref{sec:dict-4}) since Mathlib has no cosieve type. \\
+\citep[Definition~2.2]{Mayeux} (graph $\calG$) & \lc{Localization.Construction.LocQuiver} & Mathlib; one edge $a$ per morphism of $\calC$, one edge $l_d$ per $d\in\Sigma$. \\
+\citep[Definition~2.3]{Mayeux} ($\Sigma$-sequence) & \lc{Quiver.Path}, \lc{Paths} & Mathlib; paths in the \lc{LocQuiver}. \\
+\citep[Definition~2.4]{Mayeux} (equivalence of sequences) & \lc{Localization.Construction.relations} & Mathlib; a congruence on \lcode{Paths (LocQuiver }\ensuremath{\Sigma}\lcode{)}. \\
+\citep[Definition~2.5]{Mayeux} ($\Sigma$-fraction) & \lc{MorphismProperty.Localization} & Mathlib; underlying type of \lcode{(CenterMorphismProperty Z).Localization}. \\
+\citep[Fact~2.6]{Mayeux} (composite of $l_{d'}, l_d$) & --- & no separate Lean counterpart; a special case of the relations of \citep[Definition~2.4]{Mayeux}/\lc{Localization.Construction.relations}, not restated on its own. \\
+\citep[Definition~2.7]{Mayeux} ($\calC[\Sigma^{-1}]$, $L$) & \lc{CenterLocalization}, \lc{LocalizationFunctor} & thin wrappers around \lcode{(CenterMorphismProperty Z).Localization} / \lc{.Q}. \\
+\citep[Proposition~2.8]{Mayeux} (universal property of $\calC[\Sigma^{-1}]$) & \lc{Localization.Construction.lift}, \lc{Localization.Construction.fac}, \lc{Localization.Construction.uniq} & Mathlib; recovered as an instance of \citep[Theorem~3.10]{Mayeux} in \lc{Center.ofMorphisms_universal_property}, see \S\ref{sec:dict-5}. \\
+\citep[Definition~2.9]{Mayeux} (center) & \lc{Center} & structure with fields \lc{I}, \lc{nonempty}, \lc{dom}, \lc{cod}, \lc{mor}, \lc{N}; see \S\ref{sec:centers}. \\
+\citep[Definition~2.10]{Mayeux} ($\{[N_i,d_i]\}$-fraction) & \lc{CenterSievePair}, \lc{inv_in_path}, \lc{fraction_in_path_single}, \lc{fraction_in_loc_single}, \lc{IsPairMor}, \lc{PairMorWitness}, \lc{GeneratorMorphismData.fraction} & \lcode{CenterSievePair Z := }\ensuremath{\Sigma}\lcode{ i : Z.I, }\ensuremath{\Sigma}\lcode{ X : C, {f : X }\ensuremath{\longrightarrow}\lcode{ Z.cod i // Z.N i f}} records one $(i,n)$-generator; its underlying morphism is built in three steps --- \lc{inv_in_path} (the edge $\ell_{d_i}$, Mathlib's \ensuremath{\psi_2}), \lc{fraction_in_path_single} (the path-level composite $n \circ \ell_{d_i}$), \lc{fraction_in_loc_single} (its class in $\calC[\Sigma^{-1}]$) --- and \lc{GeneratorMorphismData} then builds the quiver of \S\ref{sec:dilatation-construction}. \\
+\citep[Fact~2.11]{Mayeux} (associativity of fraction composition) & \lc{Paths.categoryPaths}, \lc{CategoryTheory.Quotient.category} & associativity is inherited for free from Mathlib's path-category and quotient-category instances rather than checked by hand on explicit representative sequences. \\
+\citep[Remark~2.12]{Mayeux} & \lc{GeneratorMorphismData.original} & the two clauses of the remark are definitional consequences of how \lc{GeneratorQuiver} is built, not separate lemmas. \\
+\citep[Definition~2.13]{Mayeux} ($\calC'=\calC[\{(d_i)^{-1}\circ N_i\}]$) & \lc{Dila}, \lc{DilaRel}, \lc{GeneratedCategory}, \lc{GeneratedToDila} & $\calC'$ \lcode{:= Quotient (DilaRel Z)}; see \S\ref{sec:dilatation-construction}. \\
+\citep[Fact~2.14]{Mayeux} (faithful functor $\calC' \to \calC[\Sigma^{-1}]$) & \lc{DilaToLoc}, \lc{Fact_2_14} & \lcode{Fact_2_14 : (DilaToLoc Z).Faithful}. \\
+\citep[Fact~2.15]{Mayeux} ($\calC' \cong \calC[\Sigma^{-1}]$ when all $N_i = S^\calC_{Id_{cod(d_i)}}$) & \lc{Center.ofMorphisms}, \lc{CatToDila_ofMorphisms_isIso}, \lc{Fact_2_15} & \lc{Center.ofMorphisms} builds the center with \lcode{N := fun _ => }\ensuremath{\top}; \lc{Fact_2_15} is the isomorphism \lcode{Cat.of (Dila _) }\ensuremath{\cong}\lcode{ Cat.of (... .Localization)}. \\
+\citep[Corollary~2.16]{Mayeux} (smallness) & --- & not formalized; size discipline is handled by \lcode{Center C}'s universe annotations rather than an explicit smallness lemma. \\
+\end{longtable}
+\endgroup
+
+\subsection{Section 3: the universal property and related results}
+\label{sec:dict-3}
+
+\begingroup
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{@{}p{2.55cm}p{4.1cm}p{4.75cm}@{}}
+\toprule
+\textbf{Mathematics} & \textbf{Lean declaration} & \textbf{Comments} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Mathematics} & \textbf{Lean declaration} & \textbf{Comments} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\citep[Proposition~3.1(i)]{Mayeux} ($\Theta : \calC \to \calC'$) & \lc{CatToDila} & \\
+\citep[Proposition~3.1(ii)]{Mayeux} (fraction $b=d_i\backslash n$) & \lc{fraction_in_dila_single}, \lc{fraction_in_dila_comp_mor} & existence and the defining triangle; uniqueness is folded into \lc{Dila_universal_property} applied later rather than proved again on the spot. \\
+\citep[Fact~3.2]{Mayeux} (bimorphism under a faithful functor) & \lc{Fact_3_2} & stated for arbitrary \lcode{F : A }\ensuremath{\Rightarrow}\lcode{ B} with \lc{[F.Faithful]}, not specialized to $\Theta$. \\
+\citep[Proposition~3.3]{Mayeux} ($\Theta(d_i)$ is a bimorphism) & \lc{Prop_3_3} & \\
+\citep[Definition~3.4]{Mayeux} ($S^{\calC'}_{\Theta(N_i)}$, $S^{\calC'}_{\Theta(d_i)}$) & \lc{CatToDilaSieve} & \lcode{CatToDilaSieve Z (Z.N i) := Sieve.functorPushforward (CatToDila Z) (Z.N i)}; $S^{\calC'}_{\Theta(d_i)}$ itself is not named and is written out as \lcode{Sieve.generate (Presieve.singleton ((CatToDila Z).map (Z.mor i)))} at each use. \\
+\citep[Proposition~3.5]{Mayeux} ($S^{\calC'}_{\Theta(N_i)} \subset S^{\calC'}_{\Theta(d_i)}$) & \lc{CatToDila_image_sieve_le_singleton} & \\
+\citep[Definition~3.6]{Mayeux} ($Cat_\calC^{\Sigma\text{-reg}}$) & \lc{IsSigmaRegular} & a \lc{Prop} (membership only), not a category; see \S\ref{sec:sigma-regular}. \\
+\citep[Fact~3.7]{Mayeux} ($\Theta$ is $\Sigma$-regular) & \lc{CatToDila_isSigmaRegular} & \\
+\citep[Fact~3.8]{Mayeux} ($\Sigma'\subset\Sigma$, $L$ faithful $\Rightarrow L'$ faithful) & \lc{faithful_of_comp_faithful}, \lc{faithful_of_comp_faithful_gen} & replaces the paper's triangle-of-functors argument with the purely categorical fact ``if $p\ggg e$ is faithful then $p$ is faithful,'' which also drives \citep[Fact~3.7]{Mayeux}; applied instance: \lc{IsSigmaRegular_sum_inl_of} (\citep[Proposition~3.15]{Mayeux}). \\
+\citep[Remark~3.9]{Mayeux} (Buan--Marsh) & --- & not formalized, and not needed: the paper itself states it is not used in the rest of the text. \\
+\citep[Theorem~3.10]{Mayeux} (universal property) & \lc{DilaLift} ($F'$), \lc{DilaLift_fac}, \lc{DilaLift_unique}, \lc{Dila_universal_property} & \lc{DilaLift} is $F'$ as a named construction (a quotient-lift of the path-lift $H$, \S\ref{sec:universal-property}); \lc{DilaLift_fac} is $F' \circ \Theta = F$, \lc{DilaLift_unique} its uniqueness, and \lc{Dila_universal_property} their packaging as \ensuremath{\exists}\lcode{! (G : Dila Z }\ensuremath{\Rightarrow}\lcode{ D), CatToDila Z }\ensuremath{\ggg}\lcode{ G = F}, under hypotheses \lcode{hfaith : (ImageCenterLocalizationFunctor Z F).Faithful} and \lcode{hsieve : }\ensuremath{\forall}\lcode{ i, Sieve.functorPushforward F (Z.N i) }\ensuremath{\leq}\lcode{ Sieve.generate (Presieve.singleton (F.map (Z.mor i)))}, i.e.\ conditions~(2),(1) kept separate rather than bundled as membership in $Cat_\calC^{\Sigma\text{-reg}}$; see \S\ref{sec:sigma-regular}. \\
+\citep[Fact~3.11]{Mayeux} (pushforward of a generated sieve) & \lc{CatToDila_comp_image_sieve_le_singleton} & the composite-functor form used directly in the proof of \citep[Theorem~3.10]{Mayeux} and \citep[Proposition~3.12]{Mayeux}; the bare statement about an arbitrary functor $H$ is Mathlib's \lc{Sieve.functorPushforward_comp}. \\
+\citep[Proposition~3.12]{Mayeux} ($\Theta$ represents $Cat_\calC^{\Sigma\text{-reg}}\to Set$) & \lc{CatToDila_represents} & stated as an ``iff'': \lcode{(}\ensuremath{\exists}\lcode{! G, CatToDila Z }\ensuremath{\ggg}\lcode{ G = F) }\ensuremath{\leftrightarrow}\lcode{ }\ensuremath{\forall}\lcode{ i, ...}, rather than as a bijection of \lc{Hom}-sets; equivalent, more convenient to use. \\
+\citep[Fact~3.13]{Mayeux} (subsieve $M_i \subset N_i$ gives a faithful $\varphi$) & \lc{Fact313Phi}, \lc{IsSigmaRegular_altSieve} & built from \citep[Theorem~3.10]{Mayeux} applied to $\Theta$, exactly as \lc{restrictPhi}; faithfulness via \lc{Dila_factor_unique} and \lc{faithful_of_comp_faithful} (\S\ref{sec:subsieve}). \\
+\citep[Proposition~3.14]{Mayeux} ($K \subset I$, functor $\Phi$; full/faithful) & \lc{Center.restrict}, \lc{restrictPhi}, \lc{restrictPhi_full}, \lc{restrictPhi_faithful} & part (i) is \lc{restrictPhi_full} (hypothesis \lcode{hI : }\ensuremath{\forall}\lcode{ i }\ensuremath{\notin}\lcode{ K, Z.N i = Sieve.generate (Presieve.singleton (Z.mor i))}); part (ii) is \lc{restrictPhi_faithful} (hypothesis \lcode{(baseRestrictFunctor Z K hK).Faithful}). \\
+\citep[Proposition~3.15]{Mayeux} (combining two centers) & \lc{Center.sum}, \lc{CenterZW}, \lc{Phi315} ($\Phi$), \lc{Beta315} ($\beta$), \lc{Alpha315} ($\alpha$), \lc{Alpha'315} ($\alpha'$), \lc{Iso315} & (i) \lc{Phi315_isSigmaRegular}; (ii) a hypothesis, not a proved lemma (\S\ref{sec:gap}); (iii) \lc{Alpha315}/\lc{Alpha315_spec}/\lc{Alpha315_unique}; (iv) \lc{Alpha'315}/\lc{Alpha'315_spec}; (v) \lc{Phi315_comp_Alpha315}/\lc{Alpha315_comp_Alpha'315}/\lc{Alpha'315_comp_Alpha315}; (vi) \lc{Iso315}. \\
+Remark (direct computation for 3.15(vi)) & --- & not formalized; an alternative proof strategy the paper explicitly does not use either. \\
+\citep[Fact~3.17]{Mayeux} (union of pushforward sieves) & \lc{Sieve.functorPushforward_union} & Mathlib. \\
+\citep[Proposition~3.18]{Mayeux} ($N_i''=N_i\cup N_i'$) & \lc{Center.sieveUnion}, \lc{Center.altSieve}, \lc{Alpha318}, \lc{Alpha'318}, \lc{Iso318} & mirrors \lc{Alpha315}/\lc{Alpha'315}/\lc{Iso315}, without the extra \lc{hreg} hypothesis (regularity holds unconditionally here). \\
+\end{longtable}
+\endgroup
+
+\subsection{Section 4: codilatations}
+\label{sec:dict-4}
+
+Codilatations are formalized exactly as the paper constructs them: by passing to $\calC^{\op}$,
+forming a dilatation there, and passing back; every declaration below is a thin wrapper around
+the corresponding dilatation declaration of \S\ref{sec:dict-2}--\ref{sec:dict-3}, composed with
+Mathlib's opposite-category API (\lc{Functor.op}, \lc{Functor.rightOp}, \lc{Opposite.op}).
+
+\begingroup
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{@{}p{2.55cm}p{4.1cm}p{4.75cm}@{}}
+\toprule
+\textbf{Mathematics} & \textbf{Lean declaration} & \textbf{Comments} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Mathematics} & \textbf{Lean declaration} & \textbf{Comments} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\citep[Definition~4.1]{Mayeux} (cocenter $\{[V_i,d_i]\}_{i\in I}$) & \lc{Cosieve}, \lc{Cocenter} & \lcode{Cosieve X} mirrors \lc{Sieve} but is stable under postcomposition; \lc{Cocenter} records \lcode{V i : Sieve (Opposite.op (dom i))} directly, already through the identification of \citep[Fact~4.2]{Mayeux}, avoiding re-deriving it at every use. \\
+\citep[Fact~4.2]{Mayeux} (cosieve from $X$ = sieve over $\mathrm{op}\,X$ in $\calC^{\op}$) & \lc{Cosieve.toSieveOp}, \lc{Sieve.toCosieveUnop}, \lc{Cosieve.equivSieveOp}, \lc{Cocenter.toCenterOp} & an explicit \lc{Equiv} \lc{Cosieve.equivSieveOp}, not two one-directional maps; \lcode{Cocenter.toCenterOp co : Center C\textsuperscript{op}} bundles the cocenter under this identification, ready to feed into \lc{Dila}. \\
+\citep[Definition~4.3]{Mayeux} (codilatation $\calC[\{V_i\circ(d_i)^{-1}\}]$) & \lc{Codila} & \lcode{Codila co := (Dila (co.toCenterOp))\textsuperscript{op}}, verbatim the paper's formula. \\
+\citep[Fact~4.4]{Mayeux} ($CoS^\calC_E = S^{\calC^{op}}_E$) & \lc{Cosieve.generate_toSieveOp} & \\
+\citep[Proposition~4.5(i)]{Mayeux} ($\Upsilon : \calC \to \calC[\{V_i\circ(d_i)^{-1}\}]$) & \lc{Cocenter.Upsilon} & \lcode{:= (CatToDila (co.toCenterOp)).rightOp}. \\
+\citep[Proposition~4.5(ii)]{Mayeux} (faithful $\calC[\{V_i\circ(d_i)^{-1}\}] \to \calC[\{d_i\}^{-1}]$) & \lc{Codila.faithful_to_loc_op} & an instance, obtained directly from \lc{Fact_2_14} applied in $\calC^{op}$. \\
+\citep[Proposition~4.5(iii)]{Mayeux} ($\Upsilon \in Cat_\calC^{\{d_i\}\text{-reg}}$) & \lc{Cocenter.Upsilon_isSigmaRegular} & \\
+\citep[Proposition~4.5(iv)]{Mayeux} ($\Upsilon$ represents) & \lc{Cocenter.represents} & obtained from \lc{CatToDila_represents} (\citep[Proposition~3.12]{Mayeux}) applied in $\calC^{op}$, combined with \citep[Fact~4.4]{Mayeux}. \\
+\end{longtable}
+\endgroup
+
+\subsection{Section 5: examples}
+\label{sec:dict-5}
+
+Rows follow the paper's order: \S5.1 (the universal property of localizations recovered
+from \citep[Theorem~3.10]{Mayeux}), \S5.2 (dilatations of commutative rings,
+\citep[Proposition~5.1]{Mayeux}, with the ring-level dilatation vendored from \citep{M}'s
+own Lean development), \S5.3--5.4, and \S5.5 (Theorem~\ref{thm:no-realizing-center}).
+
+\begingroup
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{@{}p{2.55cm}p{4.1cm}p{4.75cm}@{}}
+\toprule
+\textbf{Mathematics} & \textbf{Lean declaration} & \textbf{Comments} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Mathematics} & \textbf{Lean declaration} & \textbf{Comments} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\S5.1 (universal property of localizations recovered) & \lc{Center.ofMorphisms}, \lc{Center.ofMorphisms_universal_property}, \lc{Fact_2_15} & the center with all sieves trivial (\lcode{N := fun _ => }\ensuremath{\top}); any $F$ inverting every $d_i$ factors uniquely, i.e.\ \citep[Proposition~2.8]{Mayeux} as a special case of \citep[Theorem~3.10]{Mayeux}. \\
+$\{[M_i,a_i]\}_{i\in I}$ (ring center, \citep{M}) & \lcode{Multicenter A'} & vendored from \citep{M}'s own formalization. \\
+$A[\{M_i/a_i\}_{i\in I}]$ & \lc{A'[M]} (\lc{Multicenter.Dilatation}) & \\
+$\calC$ attached to $A$ (single object) & \lcode{SingleObj A'} & Mathlib. \\
+center in $\calC$ attached to $\{[M_i,a_i]\}$ & \lc{centerOfMulticenter} & builds a \lcode{Center (SingleObj A')} from a \lcode{Multicenter A'}. \\
+functor $\calC \to \calC[\{M_i/a_i\}]$ & \lc{toDilatationFunctor} & \\
+\citep[Proposition~5.1]{Mayeux} & \lc{prop_5_1}, \lc{Iso51} & \lc{prop_5_1} is the universal-property half, via \citep[Theorem~3.10]{Mayeux} (faithfulness from the generators of $M$ being non-zero-divisors in $A'[M]$); \lc{Iso51} assembles it with its inverse \lc{Psi51} into \lcode{Dila (centerOfMulticenter M) }\ensuremath{\cong}\lcode{ SingleObj A'[M]}. \\
+naive $\calC[\{(a_i)^{-1}\circ M_i\}_{i\in I}] \cong A[M]$ (false, \S\ref{sec:rings-gap}) & \lc{centerNaive}, \lc{PhiNaive}, \lc{target_elt_not_in_range}, \lc{no_C_compatible_equiv} & \lc{centerNaive} is the literal $i$-indexed center; \lc{PhiNaive} the comparison functor from \citep[Theorem~3.10]{Mayeux}; \lc{target_elt_not_in_range} shows $(X{+}2)/2$ is unreachable; \lc{no_C_compatible_equiv} concludes no compatible functor is an equivalence. \\
+\S5.3 (monoid dilatations), \S5.4 (pre-additive categories) & --- & no numbered statements; not formalized as standalone constructions. \\
+$\calC$ ($X,Y$, $Hom(X,Y)=\{a,b\}$) (\S5.5) & \lc{Obj}, \lc{CHom}, \lc{CHom.comp} & two-constructor \lcode{inductive Obj | X | Y}, and \lcode{CHom : Obj }\ensuremath{\to}\lcode{ Obj }\ensuremath{\to}\lcode{ Type} with constructors \lcode{idX, idY, a, b}; composition by pattern-matching, associativity by \lcode{cases ... <;> rfl}. \\
+$\Gamma=\{b\}$ & \lc{Gamma} & \lcode{MorphismProperty Obj}. \\
+$\calC[\Gamma^{-1}]$, distinctness of $b,a,ab^{-1}a$ & \lc{FSep}, \lc{FSep'}, \lc{cMor}, \lc{pairwise_distinct} & separated by a functor to \lcode{SingleObj (Multiplicative }\ensuremath{\mathbb{Z}}\lcode{)} sending $a\mapsto1$, $b\mapsto0$: witnesses the infinitely many morphisms $X\to Y$ and gives a separating invariant for the three named ones. \\
+$\calD$ ($Hom(X,Y)=\{b,a,ab^{-1}a\}$) & \lc{DObj}, \lc{DHom}, \lc{DHom.comp} & same pattern as \lc{Obj}/\lc{CHom}, with a third generator \lc{c} standing for $ab^{-1}a$. \\
+functors $\calC\to\calD$, $\calD\to\calC[\Gamma^{-1}]$ & \lc{CtoD}, \lc{DtoLoc}, \lc{CtoD_comp_DtoLoc} & identity on objects, as in the paper; \lc{CtoD_comp_DtoLoc} is the commuting triangle. \\
+faithfulness of $\calD\to\calC[\Gamma^{-1}]$ & \lc{DtoLoc_faithful} & \\
+``$\calC' \ne \calD$ for every center'' & \lc{GoodCenter}, \lc{false_of_not_good}, \lc{exists_C_mor_of_good}, \lc{CatToDila_full_of_good}, \lc{no_realizing_center} & see \S\ref{sec:counterexample} for the two-case analysis. \\
+\end{longtable}
+\endgroup
+
+\section{Erratum to \citep{Mayeux}}
+\label{app:erratum}
+
+\begin{itemize}
+\item The identification $\calC[\{(a_i)^{-1}\circ M_i\}_{i\in I}] \cong A[M]$ of
+\citep[Proposition~5.1]{Mayeux} should be replaced by the triple identification
+$\calC[\{(a^\nu)^{-1}\circ L^\nu\}_{\nu\in\mathbb N^{(I)}}] \cong A[\{L^\nu/a^\nu\}_{\nu\in\mathbb N^{(I)}}]
+\cong A[\{M_i/a_i\}_{i\in I}] = A[M]$ of Theorem~\ref{thm:rings-reindex}; see
+\S\ref{sec:rings-construction} above.
+\item \citep[Proposition~3.15]{Mayeux}'s part~(2) is not rigorously proved, and parts~(3),
+(5), (6), which are built on it, inherit the same gap; we essentially turn (2) into an
+assumption in the formalization (\lc{hreg}, Remark~\ref{rem:hreg-honest}); see
+\S\ref{sec:gap} above.
+\end{itemize}
+Up to these adjustments, \citep{Mayeux} is correct and formalized.
+
+\medskip\noindent{\bfseries Statements and declarations.}
+
+\smallskip\noindent{\itshape Competing interests.} The author has no competing interests
+to declare.
+
+\smallskip\noindent{\itshape Data availability.} The Lean~4 source code underlying this
+work is openly available at \url{https://github.com/rndmx/DilCat}.
+
+\smallskip\noindent This work was carried out during the 2025--2026 academic year.
+
+\medskip\noindent{\bfseries AI use disclosure.}
+In line with the programme of \citep{MayDil}, AI assistance (Claude, Anthropic) was used
+in the development of the Lean formalization, under the author's direction. The
+correctness of the formalization does not rest on this assistance: every statement and
+proof is mechanically checked by the Lean kernel. The author reviewed all AI-assisted
+material and retains full responsibility for the content.
+
+\begin{thebibliography}{99}
+
+\bibitem[Dubouloz, Mayeux and dos Santos(to appear)]{DMS} A.~Dubouloz, A.~Mayeux and
+  J.P.~dos Santos, A survey on algebraic dilatations, {\it Fields Institute Monographs},
+  Springer, to appear.
+
+\bibitem[Gabriel and Zisman(1967)]{GZ} P.~Gabriel and M.~Zisman, {\it Calculus of fractions
+  and homotopy theory}, Ergebnisse der Mathematik und ihrer Grenzgebiete 35, Springer-Verlag,
+  New York, 1967.
+
+\bibitem[The mathlib Community(2020)]{mathlib} The mathlib Community, The Lean mathematical
+  library, in {\it Proceedings of the 9th ACM SIGPLAN International Conference on Certified
+  Programs and Proofs (CPP 2020)}, ACM, 2020, 367--381.
+
+\bibitem[Mayeux(2024)]{M} A.~Mayeux, Multi-centered dilatations, congruent isomorphisms and
+  Rost double deformation space, {\it Transformation Groups}, 2024.
+
+\bibitem[Mayeux(2025)]{Mayeux} A.~Mayeux, Dilatations of categories, {\it Higher Structures},
+  9(2), 2025, 62--75.
+
+\bibitem[Mayeux(to appear)]{MayDil} A.~Mayeux, Formalizing all indexed mathematics as a
+  benchmark for general reasoning, in {\it Intelligent Systems and Applications ---
+  Proceedings of the 2026 Intelligent Systems Conference (IntelliSys)}, Lecture Notes in
+  Networks and Systems, Springer, to appear, arXiv:2606.03835.
+
+\bibitem[Mayeux, Richarz and Romagny(2023)]{MRR} A.~Mayeux, T.~Richarz and M.~Romagny,
+  N\'eron blowups and low-degree cohomological applications, {\it Algebraic Geometry},
+  10(6), 2023, 729--753.
+
+\bibitem[Mayeux and Zhang(2026)]{MZ} A.~Mayeux and J.~Zhang, Formalizing multi-graded
+  Brenner--Schr\"oer Proj schemes and dilatations of rings in Lean4, arXiv:2606.01438,
+  2026.
+
+\bibitem[de Moura and Ullrich(2021)]{Lean4} L.~de Moura and S.~Ullrich, The Lean~4 theorem
+  prover and programming language, in {\it Automated Deduction --- CADE 28}, Lecture Notes
+  in Computer Science 12699, Springer, 2021, 625--635.
+
+\end{thebibliography}
+
+\end{document}

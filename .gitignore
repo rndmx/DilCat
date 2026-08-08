@@ -1,0 +1,12 @@
+# Lean / Lake build artifacts and vendored dependencies
+.lake/
+
+# LaTeX byproducts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# Scratch files
+Scratch.lean
