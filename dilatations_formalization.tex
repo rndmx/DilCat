@@ -1334,8 +1334,10 @@ the formalization proves the analogous regularity unconditionally.
 
 \subsubsection*{The Lean construction}
 For each $i \in I$, let $N_i'$ be another sieve over $\cod(d_i)$, and $N_i'' := N_i\cup N_i'$
-their union (\lc{Center.sieveUnion}); let \lc{Center.altSieve} denote the center on $\calC_Z$
-obtained by pushing forward $N_i'$ (rather than $N_i$) along $\Theta_Z$. The two comparison
+their union (\lc{Center.sieveUnion}); let \lc{Center.altSieve} denote the center on $\calC$
+with the same generators $\{d_i\}_{i\in I}$ and sieves $N_i'$ in place of $N_i$, so that the
+two-copy center carrying both sieve families side by side is the sum
+\lcode{Z.sum (Z.altSieve N')} of \S\ref{sec:combining-construction}. The two comparison
 functors are built exactly as \lc{Alpha315} and \lc{Alpha'315} were, via
 Theorem~\ref{thm:universal-property}, applied once in each direction, and recorded as
 \lc{Alpha318} and \lc{Alpha'318}, with \lc{Iso318} assembling them into an isomorphism of
@@ -1345,8 +1347,9 @@ categories, mirroring \lc{Iso315} verbatim.
 \begin{proposition}[{\citep[Proposition~3.18]{Mayeux}}]
 \label{prop:sieve-union}
 With notation as above, $\calC[\{(d_i)^{-1}\circ N_i\}_{i\in I}, \{(d_i)^{-1}\circ
-N_i'\}_{i\in I}]$ (dilating once by $N_i$, then again by the pushforward of $N_i'$) is
-canonically isomorphic to $\calC[\{(d_i)^{-1}\circ N_i''\}_{i\in I}]$.
+N_i'\}_{i\in I}]$ (the dilatation at the two-copy center carrying both families of sieves
+on the same generators) is canonically isomorphic to
+$\calC[\{(d_i)^{-1}\circ N_i''\}_{i\in I}]$.
 \end{proposition}
 Unlike \citep[Proposition~3.15]{Mayeux}, every part of this statement (including the
 analogue of part~(2)) is proved unconditionally in the formalization, with no \lc{hreg}-style
