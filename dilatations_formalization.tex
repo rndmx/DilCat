@@ -135,18 +135,17 @@ mathematics, formalized mathematical data, automated deduction}
 \maketitle
 
 \begin{abstract}
-Given a category $\calC$ and a center, that is a collection of pairs $(d_i, N_i)$
-consisting of a morphism $d_i$ and a sieve $N_i$ over its codomain, the dilatation of
-$\calC$ is a new category $\calC'$ in which every $n \in N_i$ factors, uniquely and
-functorially, through $d_i$. This construction refines the classical localization of
-categories. This paper presents the theory of dilatations of categories through a full
-formalization of the construction and its main theorems in the Lean~4 proof assistant, on
-top of the Mathlib library. In particular, we formalize the universal property of
+Given a category $\calC$ and a center, that is, a family of pairs $(d_i, N_i)$ with $d_i$ a
+morphism and $N_i$ a sieve over its codomain, the dilatation of $\calC$ is a new category
+$\calC'$ in which every $n \in N_i$ factors, uniquely and functorially, through $d_i$; this
+refines the classical localization of categories. We present the theory through a full
+formalization in the Lean~4 proof assistant, on top of Mathlib: the universal property of
 dilatations, the operations of restricting, shrinking, and combining centers, the dual
 theory of codilatations, and the comparison with dilatations of commutative rings. The
 formalization also produced minor clarifications and corrections to the published theory,
-recorded in an erratum. An appendix collects a systematic dictionary between the
-mathematical statements and the Lean declarations that formalize them.
+recorded in an erratum. Appendices collect a statement-by-statement dictionary to the Lean
+declarations, and material on dilatations of rings relevant to the comparison with
+dilatations of categories.
 \end{abstract}
 
 \setcounter{tocdepth}{1}
@@ -257,7 +256,10 @@ finite counterexample showing that a natural strengthening of the theory, which 
 rings, fails for categories (\S\ref{sec:counterexample}). We follow this order, which is the
 order of the formalization, rather than the order of the original paper on this subject,
 because each construction genuinely depends on the Lean infrastructure built in the sections
-that precede it.
+that precede it. Three appendices follow: the statement-by-statement dictionary
+(Appendix~\ref{app:dictionary}), a short erratum to \citep{Mayeux}
+(Appendix~\ref{app:erratum}), and an appendix on dilatations of rings \citep{M}, relevant to
+the comparison with dilatations of categories (Appendix~\ref{app:ring-elementary}).
 
 \subsection{Conventions}
 \label{sec:conventions}
@@ -1067,21 +1069,27 @@ quotients of different generated categories, so $\varphi$ is instead built from
 Theorem~\ref{thm:universal-property} and \lc{Dila_factor_unique}.
 \end{designchoice}
 
-\section{Combining two centers}
+\section{Two isomorphisms between dilatations built in stages from different centers}
 \label{sec:combining}
 
-The second, and by far the most delicate, operation on centers combines two centers
-on the same category into one, and relates the resulting dilatation to an iterated
-dilatation, first dilate by one center, then dilate the result by (the pushforward of) the
-other. We present this section in the order the formalization itself builds it: first the
-construction and the six declarations it produces, entirely in the terms the source file
-uses, and only afterward do we state the corresponding result of the printed paper
-(\citep[Proposition~3.15]{Mayeux}) and compare the two. This reordering is not merely stylistic: for this
-particular result, the printed statement and the formal one turn out not to say quite the
-same thing, and the difference is easiest to see after the formal construction is already on
-the table, not before.
+This section is about two procedures, closely related but genuinely distinct. Both combine
+two pieces of data on the same category $\calC$ into one and compare the resulting dilatation
+with a dilatation carried out in two stages: first dilate by one, then dilate the result by
+(the pushforward of) the other.
 
-\subsection{The construction, in the order the formalization builds it}
+In the first (\S\ref{sec:combining-construction}--\S\ref{sec:gap}) the two pieces of data are
+two centers, with different generators; this is \citep[Proposition~3.15]{Mayeux}. We present it
+in the order the formalization builds it: first the construction and the six declarations it
+produces, in the terms the source file uses, and only then the printed statement and the
+comparison between the two. The order matters here, since the printed statement and the formal
+one turn out not to say quite the same thing, and the difference is easiest to see once the
+construction is on the table.
+
+In the second (\S\ref{sec:combining-sieves}) the two pieces of data share their generators and
+differ only in their sieves; this is \citep[Proposition~3.18]{Mayeux}, and it is formalized
+unconditionally.
+
+\subsection{Partial dilatation, then partial dilatation, equals the full dilatation}
 \label{sec:combining-construction}
 
 Fix two centers $Z = \{(d_i,N_i)\}_{i\in I}$ and $W = \{(d_j,N_j)\}_{j\in J}$ on the same
@@ -1268,7 +1276,7 @@ noncomputable def Iso315 (Z W : Center C) \\
 needing only the two composite identities just proved, not the fuller coherence data of a
 \lc{CategoryTheory.Equivalence}.
 
-\subsection{Comparison with the printed paper}
+\subsection{Comparison with \citep[Proposition~3.15]{Mayeux}}
 \label{sec:gap}
 
 Having built \lc{Center.sum}, $\Phi$, $\beta$, \lc{Alpha'315}, \lc{Alpha315}, and
@@ -1326,7 +1334,21 @@ Concretely, the formalization proves parts (1) and (4) unconditionally, but part
 (5), (6) only conditionally on the extra hypothesis \lc{hreg}.
 \end{remark}
 
-\subsection{A parallel construction without the gap: combining sieves}
+\begin{remark}[the ring-theoretic counterpart]
+\label{rem:rings-counterpart}
+For an element $a$ of a ring, being regular (a non-zero-divisor) is the same as injectivity
+of $A \to A[a^{-1}]$, which is what Definition~\ref{def:sigma-regular} asks of the one-object
+category attached to $A$; and in a dilatation the images of the $a_i$ are always
+non-zero-divisors (\citep[Fact~2.10]{M}). Over rings, therefore, the regularity needed to
+iterate the construction is a theorem, and the counterpart of
+\citep[Proposition~3.15]{Mayeux} holds unconditionally: dilating along $K \subset I$ and then
+along $I \setminus K$ recovers the one-stage dilatation
+(Proposition~\ref{prop:app-2-24} in Appendix~\ref{app:ring-elementary}, formalized without any
+analogue of \lc{hreg}). This is \citep[Proposition~2.24]{M}.
+\end{remark}
+
+\subsection{Comparing dilatation with the combination of sieves}
+\label{sec:combining-sieves}
 
 A close relative of the construction above combines, on the same family of morphisms
 $\{d_i\}_{i\in I}$, two different choices of sieves rather than two different centers, and here
@@ -1351,17 +1373,8 @@ N_i'\}_{i\in I}]$ (the dilatation at the two-copy center carrying both families 
 on the same generators) is canonically isomorphic to
 $\calC[\{(d_i)^{-1}\circ N_i''\}_{i\in I}]$.
 \end{proposition}
-Unlike \citep[Proposition~3.15]{Mayeux}, every part of this statement (including the
-analogue of part~(2)) is proved unconditionally in the formalization, with no \lc{hreg}-style
-hypothesis anywhere in \lc{Alpha318}, \lc{Alpha'318}, or \lc{Iso318}. The reason is structural,
-and it isolates precisely what made \S\ref{sec:gap} delicate: here both sides invert exactly
-the same collection of morphisms $\{d_i\}_{i\in I}$, only the sieves differ, so the
-problematic step of \S\ref{sec:gap}, comparing localizations at two different,
-growing collections of inverted morphisms, never arises; the relevant regularity is
-inherited directly from Fact~\ref{fact:theta-regular} with no enlargement of $\Sigma$ to
-account for. This confirms that the difficulty isolated in Remark~\ref{rem:hreg-honest} is
-specifically about enlarging the family of inverted morphisms, not about combining two
-pieces of data on $\calC$ as such.
+This is formalized unconditionally: every part of the statement is proved with no extra
+hypothesis anywhere in \lc{Alpha318}, \lc{Alpha'318}, or \lc{Iso318}.
 
 \section{Codilatations}
 \label{sec:codilatations}
@@ -1451,25 +1464,12 @@ once the construction is already on the table.
 The ring $A[M]$ itself is not developed inside the file discussed in this paper: it is
 vendored, essentially verbatim, from the Lean formalization of multi-centered dilatations of
 rings~\citep{MZ}, accompanying the separate paper introducing the construction
-mathematically~\citep{M}. A multi-center is a triple of an index type and
-two functions:
-\begin{leancode}
-structure Multicenter (A' : Type*) [CommSemiring A'] where \\
-  index : Type* \\
-  ideal : index → Ideal A' \\
-  elem : index → A' \\
-\end{leancode}
-Writing $L_i := M_i+(a_i)$ for the associated \emph{large ideal} (\lc{LargeIdeal}), and, for
-a finitely-supported exponent tuple $\nu \in \mathbb N^{(I)}$ (Lean notation $M^{\mathbb N}$
-for \lcode{index →₀ ℕ}), $a^\nu := \prod_i a_i^{\nu_i}$ and $L^\nu := \prod_i L_i^{\nu_i}$
-(\lc{familyPow}, \lc{prodLargeIdealPower}), a general element of $A[M]$ is a pair
-$(\nu,m)$ with $m \in L^\nu$ (\lc{PreDil}), modulo the equivalence
-$(\nu,m)\sim(\nu',m')$ iff $m\cdot a^{\nu'+\beta} = m'\cdot a^{\nu+\beta}$ for some
-$\beta\in\mathbb N^{(I)}$ (\lc{Multicenter.r}); $A[M]$ (\lc{Multicenter.Dilatation}) is the
-resulting quotient. This is a deliberate scope decision: re-deriving the ring-theoretic
-theory here would duplicate an existing, independently-developed formalization, and the only
-new content needed for this paper is the comparison with dilatations of categories,
-described next.
+mathematically~\citep{M}. The construction is recalled, with its Lean rendering, in
+\S\ref{sec:appC-construction}; we use it here as a black box. This is a deliberate scope
+decision: re-deriving the ring-theoretic theory here would duplicate an existing,
+independently-developed formalization. The new content on the ring side is the comparison
+with dilatations of categories, described next, together with the elementary properties
+collected in Appendix~\ref{app:ring-elementary}.
 
 \subsubsection*{The index type $M^{\mathbb N}$}
 \begin{leancode}
@@ -1515,7 +1515,7 @@ stable under composition, contains every generator-image (central because $A$ is
 commutative, \lc{genImage\_central}), and contains every formal inverse (a central element's
 inverse is central), hence is everything
 (\lc{Localization.Construction.morphismProperty\_is\_top}). With commutativity in hand,
-\lc{Phi51}$\ggg$\lc{kappaFunctor} is identified with the (unconditionally faithful, Fact~2.14)
+\lc{Phi51}$\ggg$\lc{kappaFunctor} is identified with the (unconditionally faithful, Fact~\ref{fact:faithful-into-localization})
 \lc{DilaToLoc} of \lc{centerOfMulticenter}$\,M$ by \lc{Dila\_factor\_unique}, and
 \lc{faithful\_of\_comp\_faithful} gives \lc{Phi51\_faithful}.
 
@@ -1929,6 +1929,93 @@ assumption in the formalization (\lc{hreg}, Remark~\ref{rem:hreg-honest}); see
 \end{itemize}
 Up to these adjustments, \citep{Mayeux} is correct and formalized.
 
+\section{Dilatations of rings}
+\label{app:ring-elementary}
+
+The Lean development also contains a section, \lc{AppendixC} in the source, formalizing
+material from \citep[\S 2.2]{M} on \emph{dilatations of rings}, independent of the
+categorical theory of the body of this paper. This appendix documents what is formalized
+there. The full formalization of \citep{M} will be the topic of a future paper; we record
+here only what is relevant to the present one.
+
+\subsection{The construction}
+\label{sec:appC-construction}
+
+A \emph{multi-center} in a commutative ring $A$ is a family $\{[M_i,a_i]\}_{i\in I}$ of an
+ideal $M_i$ and an element $a_i$ of $A$ for each $i \in I$. In Lean it is a triple of an
+index type and two functions:
+\begin{leancode}
+structure Multicenter (A' : Type*) [CommSemiring A'] where \\
+  index : Type* \\
+  ideal : index → Ideal A' \\
+  elem : index → A' \\
+\end{leancode}
+Write $L_i := M_i+(a_i)$ for the associated \emph{large ideal} (\lc{LargeIdeal}) and, for a
+finitely-supported exponent tuple $\nu \in \mathbb N^{(I)}$ (Lean notation $M^{\mathbb N}$
+for \lcode{index →₀ ℕ}), $a^\nu := \prod_i a_i^{\nu_i}$ and $L^\nu := \prod_i L_i^{\nu_i}$
+(\lc{familyPow}, \lc{prodLargeIdealPower}). A general element of the dilatation
+$A[\{M_i/a_i\}_{i\in I}]$ is then a pair $(\nu,m)$ with $m \in L^\nu$ (\lc{PreDil}), modulo
+the equivalence $(\nu,m)\sim(\nu',m')$ iff $m\cdot a^{\nu'+\beta} = m'\cdot a^{\nu+\beta}$
+for some $\beta\in\mathbb N^{(I)}$ (\lc{Multicenter.r}); the dilatation $A[M]$
+(\lc{Multicenter.Dilatation}, notation \lc{A'[M]}) is the resulting quotient. See
+\S\ref{sec:rings-construction} for the provenance of this construction and for the use made
+of it in the body of the paper.
+
+\subsection{Restricting a multicenter, and the two-stage dilatation}
+\label{sec:appC-restrict}
+
+For a subset $K \subset I$ we write $M|_K$ for the multicenter $\{[M_i,a_i]\}_{i\in K}$
+obtained by restricting the index set, formalized as \lc{Multicenter.restrict}. Writing
+$B = A[\{M_i/a_i\}_{i\in K}]$ for the corresponding first-stage dilatation, the
+complementary indices $j \in I \setminus K$ determine a multicenter in $B$, namely
+$\{[B\cdot M_j, a_j/1]\}_{j \in I \setminus K}$, formalized as
+\lc{Multicenter.complement}; here $B \cdot M_j$ is the ideal of $B$ generated by the image
+of $M_j$, rendered in Lean as \lcode{Ideal.map (algebraMap A' B) (M.ideal j)}.
+
+\begin{proposition}[{\citep[Proposition~2.24]{M}}]
+\label{prop:app-2-24}
+Let $K \subset I$. There is a canonical isomorphism of $A[\{M_i/a_i\}_{i\in K}]$-algebras
+\[
+  A\Big[\big\{\tfrac{M_i}{a_i}\big\}_{i\in K}\Big]
+    \Big[\Big\{\tfrac{A[\{M_i/a_i\}_{i\in K}]\,M_j}{a_j}\Big\}_{j \in I\setminus K}\Big]
+  \;\xrightarrow{\ \sim\ }\;
+  A\Big[\big\{\tfrac{M_i}{a_i}\big\}_{i\in I}\Big].
+\]
+In words: dilating first along the indices in $K$ and then along the remaining indices
+recovers the dilatation along all of $I$ in one step.
+\end{proposition}
+
+The isomorphism of Proposition~\ref{prop:app-2-24} is moreover the \emph{only} one, and this
+too is a consequence of the universal property rather than of any computation.
+
+\begin{lemma}[\lc{prop_2_24_unique}, \lc{prop_2_24_existsUnique}]
+\label{lem:app-2-24-unique}
+With the notation of Proposition~\ref{prop:app-2-24}, there is exactly one isomorphism
+\[
+  A\Big[\big\{\tfrac{M_i}{a_i}\big\}_{i\in K}\Big]
+    \Big[\Big\{\tfrac{A[\{M_i/a_i\}_{i\in K}]\,M_j}{a_j}\Big\}_{j \in I\setminus K}\Big]
+  \;\xrightarrow{\ \sim\ }\;
+  A\Big[\big\{\tfrac{M_i}{a_i}\big\}_{i\in I}\Big]
+\]
+compatible with the canonical maps out of $A[\{M_i/a_i\}_{i\in K}]$, namely the one of
+Proposition~\ref{prop:app-2-24}.
+\end{lemma}
+
+Indeed, the uniqueness half of \citep[Proposition~2.29]{M} already gives more: \emph{every}
+$A[\{M_i/a_i\}_{i\in K}]$-algebra map from the two-stage dilatation to
+$A[\{M_i/a_i\}_{i\in I}]$ equals the morphism of Proposition~\ref{prop:app-2-24}
+(\lc{chi224_unique}).
+Uniqueness of the isomorphism follows at once, since an isomorphism of algebras is determined
+by its underlying algebra map.
+
+In the Lean source these are \lc{prop_2_24}, \lc{chi224_unique} and
+\lc{prop_2_24_existsUnique}; all three are obtained from the universal property of dilatations of
+rings (\citep[Proposition~2.29]{M}, in the development \lc{Multicenter.desc} with its
+uniqueness statement \lc{Multicenter.lemma_exists_unique_morphism}), applied to the
+multicenter \lc{Multicenter.complement}. We do not reproduce the arguments here: they are
+those of \citep[\S 2.2]{M}, and the full formalization of \citep{M} is the subject of a
+future paper.
+
 \medskip\noindent{\bfseries Statements and declarations.}
 
 \smallskip\noindent{\itshape Competing interests.} The author has no competing interests
@@ -1956,8 +2043,8 @@ Claude (Anthropic) assisted with this matter, under the author's direction.
   library, in {\it Proceedings of the 9th ACM SIGPLAN International Conference on Certified
   Programs and Proofs (CPP 2020)}, ACM, 2020, 367--381.
 
-\bibitem[Mayeux(2024)]{M} A.~Mayeux, Multi-centered dilatations, congruent isomorphisms and
-  Rost double deformation space, {\it Transformation Groups}, 2024.
+\bibitem[Mayeux(2026)]{M} A.~Mayeux, Multi-centered dilatations, congruent isomorphisms and
+  Rost double deformation space, {\it Transformation Groups}, 31 (2026), 1801--1850.
 
 \bibitem[Mayeux(2025)]{Mayeux} A.~Mayeux, Dilatations of categories, {\it Higher Structures},
   9(2), 2025, 62--75.
